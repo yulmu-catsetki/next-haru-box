@@ -22,7 +22,7 @@ const DiaryPage = () => {
     };
   }
 
-  const router = useRouter();
+  // const router = useRouter();
   const { data: session, status } = useMockSession()  // 원래는 useSession();
 
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
@@ -80,6 +80,7 @@ const DiaryPage = () => {
       });
 
       if (!res.ok) {
+        alert(`HTTP error! status: ${res.status}`);
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
