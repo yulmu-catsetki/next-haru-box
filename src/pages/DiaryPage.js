@@ -151,11 +151,17 @@ const DiaryPage = () => {
           />
 
           <div className="flex justify-center mb-6">
-            {[1, 2, 3, 4, 5].map((val) => (
+            {[
+              '😀', // Joy
+              '😔', // Sadness
+              '😡', // Anger
+              '😱', // Fear
+              '😐', // Neutral
+            ].map((val, index) => (
               <button
-                key={val}
-                onClick={() => handleEmotionChange(val)}
-                className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === val ? 'bg-blue-500' : 'bg-white'
+                key={index + 1}
+                onClick={() => handleEmotionChange(index + 1)}
+                className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
                   }`}
               >
                 {val}
