@@ -1,0 +1,7 @@
+.room-container {
+    cursor: default;
+  }
+  
+  .hoverable-mesh {
+    cursor: pointer;
+  }
