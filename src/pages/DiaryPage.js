@@ -25,6 +25,8 @@ const DiaryPage = () => {
   // const router = useRouter();
   const { data: session, status } = useMockSession()  // 원래는 useSession();
 
+  const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
+
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
   const [content, setContent] = useState('');
   const [emotion, setEmotion] = useState(1);
@@ -143,12 +145,19 @@ const DiaryPage = () => {
       <div className="flex flex-grow items-center justify-center">
         <div className="w-2/5 flex flex-col items-center justify-center pr-4">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">{date}</h1> {/* 날짜 표시 수정 */}
+          
+          <div className="relative w-1/2">
           <textarea
             value={content}
             onChange={handleContentChange}
+            maxLength={MAX_CONTENT_LENGTH}
             placeholder="일기를 작성하세요..."
-            className="w-full md:w-1/2 h-96 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
+            className="w-full h-96 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
           />
+          <div className="absolute right-3 bottom-3 text-xs text-gray-400">
+            {`${content.length}/${MAX_CONTENT_LENGTH}`}
+          </div>
+        </div>
 
           <div className="flex justify-center mb-6">
             {[
