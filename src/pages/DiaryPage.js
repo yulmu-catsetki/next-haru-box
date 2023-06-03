@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { getStorage } from 'firebase/storage';
-import "firebase/firestore";
+//import "firebase/firestore";
 import { db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 // import { useSession } from "next-auth/react"; 아직 구현 안됨
 // import { useRouter } from 'next/router';
-
+function useMockSession() { // 카카오톡 로그인 세션 정보
+  return {
+    data: {
+      user: {
+        name: '민준세수',
+        email: 'dummy@domain.com',
+        image: 'https://media.discordapp.net/attachments/1100237467619180624/1100239612053553152/IMG_7276.png?width=676&height=676',
+        id: 'dummy-id',
+      },
+    },
+    status: 'authenticated',
+  };
+}
 const DiaryPage = () => {
 
-  function useMockSession() { // 카카오톡 로그인 세션 정보
-    return {
-      data: {
-        user: {
-          name: '민준세수',
-          email: 'dummy@domain.com',
-          image: 'https://media.discordapp.net/attachments/1100237467619180624/1100239612053553152/IMG_7276.png?width=676&height=676',
-          id: 'dummy-id',
-        },
-      },
-      status: 'authenticated',
-    };
-  }
+  
 
   // const router = useRouter();
   const { data: session, status } = useMockSession()  // 원래는 useSession();

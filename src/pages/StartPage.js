@@ -6,10 +6,6 @@ const navigate = useNavigate();
 
   const handleLogin = () => {
     
-
-    // Implement login functionality using Kakao API
-    // Set user authentication status or access token
-    // Navigate to the Main Page upon successful login
     navigate('/main'); //일단 임시로 이렇게 둠 
   };
 
