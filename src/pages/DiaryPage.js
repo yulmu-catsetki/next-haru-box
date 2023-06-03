@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 // import { useSession } from "next-auth/react"; 아직 구현 안됨
 // import { useRouter } from 'next/router';
+import axios from 'axios';
 
 const DiaryPage = () => {
 
@@ -110,7 +111,7 @@ const DiaryPage = () => {
       setImgUrl(url);
     }
   };
-  const handleGenerateImage = async (event) => {
+  const handleGenerateImage_OPENAI = async (event) => {
 
     if (content.trim() === '') {
       alert('일기 내용을 입력하세요!');
@@ -183,6 +184,62 @@ const DiaryPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
       });
+    }
+  };
+  const handleGenerateImage_Dream = async () => {
+
+    if (content.trim() === '') {
+      alert('일기 내용을 입력하세요!');
+      return;
+    }
+
+    console.log("prompt: " + content);
+
+    // 날짜가 바뀌었는지 확인하고 횟수를 재설정하는 함수
+    const checkAndResetGenerateTimes = () => {
+      const storedDate = localStorage.getItem('generateDate');
+      const currentDate = new Date().toLocaleDateString();
+
+      if (storedDate !== currentDate) {
+        localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
+        localStorage.setItem('generateDate', currentDate);
+        setGenerateTimes(MAX_GENERATE_TIMES);
+      }
+    };
+
+    // 그림 생성 전에 로컬 스토리지를 확인하고 제한 횟수를 확인하는 함수
+    const canGenerateImage = () => {
+      checkAndResetGenerateTimes();
+
+      let storedTimes = Number(localStorage.getItem('generateTimes'));
+
+      if (storedTimes > 0) {
+        localStorage.setItem('generateTimes', String(storedTimes - 1));
+        setGenerateTimes(storedTimes - 1);
+
+        console.log("generateTimes: " + generateTimes);
+        return true;
+      } else {
+        alert(`하루에 ${MAX_GENERATE_TIMES}번만 그림을 생성할 수 있습니다.`);
+        return false;
+      }
+    };
+
+    if (!canGenerateImage()) { return; }
+
+    try {
+      const res = await axios.post('/api/dream', {
+        style_id: 96,
+        prompt: content,
+        target_img_path: null
+      });
+
+      console.log("응답 데이터: ", res.data);
+      console.log("응답 데이터 URL: ", res.dataimageUrl);
+      setImgUrl(res.data.imageUrl);
+
+    } catch (error) {
+      console.error(error);
     }
   };
   const handleContentChange = (e) => setContent(e.target.value);
@@ -269,7 +326,7 @@ const DiaryPage = () => {
 
 
           <button
-            onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage}
+            onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
             className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
           >
             그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
@@ -289,6 +346,7 @@ const DiaryPage = () => {
             />
             <p className="text-lg font-bold text-gray-800">더미 사진 생성</p>
           </div>
+    
         </div>
         <div className="w-3/5 h-1/2 flex flex-col items-center justify-center pr-5">
 
