@@ -152,11 +152,10 @@ const DiaryPage = () => {
 
           <div className="flex justify-center mb-6">
             {[
-              '😀', // Joy
-              '😔', // Sadness
-              '😡', // Anger
-              '😱', // Fear
               '😐', // Neutral
+              '😀', // Joy
+              '😭', // Sadness
+              '😡', // Anger
             ].map((val, index) => (
               <button
                 key={index + 1}
