@@ -26,12 +26,18 @@ const DiaryPage = () => {
   const { data: session, status } = useMockSession()  // 원래는 useSession();
 
   const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
+  const MAX_GENERATE_TIMES = 5; // 하루에 생성할 수 있는 그림의 최대 횟수
+
 
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
   const [content, setContent] = useState('');
   const [emotion, setEmotion] = useState(1);
   const [imgUrl, setImgUrl] = useState('');
-  const [aiMode, setAiMode] = useState(false); // 테스트 용
+
+  // 남은 생성 횟수
+  const [generateTimes, setGenerateTimes] = useState(MAX_GENERATE_TIMES);
+
+  const [dummyMode, setDummyMode] = useState(false); // 테스트 용
 
   const handleSaveDiary = async () => {
 
@@ -66,13 +72,85 @@ const DiaryPage = () => {
     setEmotion(1);
     setImgUrl(null);
   };
-  const handleGenerateImage = () => {
-    const url = "https://picsum.photos/seed/" + Date.now() + "/800/600";
-    setImgUrl(url);
+  const handleGenerateImage_Dummy = () => {
+
+    
+    // 날짜가 바뀌었는지 확인하고 횟수를 재설정하는 함수
+    const checkAndResetGenerateTimes = () => {
+      const storedDate = localStorage.getItem('generateDate');
+      const currentDate = new Date().toLocaleDateString();
+
+      if (storedDate !== currentDate) {
+        localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
+        localStorage.setItem('generateDate', currentDate);
+        setGenerateTimes(MAX_GENERATE_TIMES);
+      }
+    };
+
+    // 그림 생성 전에 로컬 스토리지를 확인하고 제한 횟수를 확인하는 함수
+    const canGenerateImage = () => {
+      checkAndResetGenerateTimes();
+
+      let storedTimes = Number(localStorage.getItem('generateTimes'));
+
+      if (storedTimes > 0) {
+        localStorage.setItem('generateTimes', String(storedTimes - 1));
+        setGenerateTimes(storedTimes - 1);
+
+        console.log("generateTimes: " + generateTimes);
+        return true;
+      } else {
+        alert(`하루에 ${MAX_GENERATE_TIMES}번만 그림을 생성할 수 있습니다.`);
+        return false;
+      }
+    };
+
+    if (canGenerateImage()) {
+      const url = "https://picsum.photos/seed/" + Date.now() + "/800/600";
+      setImgUrl(url);
+    }
   };
-  const handleGenerateImage_AI = async (event) => {
+  const handleGenerateImage = async (event) => {
+
+    if (content.trim() === '') {
+      alert('일기 내용을 입력하세요!');
+      return;
+    }
+
     event.preventDefault();
     console.log("prompt: " + content);
+
+    // 날짜가 바뀌었는지 확인하고 횟수를 재설정하는 함수
+    const checkAndResetGenerateTimes = () => {
+      const storedDate = localStorage.getItem('generateDate');
+      const currentDate = new Date().toLocaleDateString();
+
+      if (storedDate !== currentDate) {
+        localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
+        localStorage.setItem('generateDate', currentDate);
+        setGenerateTimes(MAX_GENERATE_TIMES);
+      }
+    };
+
+    // 그림 생성 전에 로컬 스토리지를 확인하고 제한 횟수를 확인하는 함수
+    const canGenerateImage = () => {
+      checkAndResetGenerateTimes();
+
+      let storedTimes = Number(localStorage.getItem('generateTimes'));
+
+      if (storedTimes > 0) {
+        localStorage.setItem('generateTimes', String(storedTimes - 1));
+        setGenerateTimes(storedTimes - 1);
+
+        console.log("generateTimes: " + generateTimes);
+        return true;
+      } else {
+        alert(`하루에 ${MAX_GENERATE_TIMES}번만 그림을 생성할 수 있습니다.`);
+        return false;
+      }
+    };
+
+    if (!canGenerateImage()) { return; }
 
     try {
       const res = await fetch('/api/image', {
@@ -109,7 +187,19 @@ const DiaryPage = () => {
   };
   const handleContentChange = (e) => setContent(e.target.value);
   const handleEmotionChange = (val) => setEmotion(val);
-  const handleAiModeChange = () => setAiMode(!aiMode);
+  const handleDummyModeChange = () => setDummyMode(!dummyMode);
+
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') {
+      const storedTimesString = localStorage.getItem('generateTimes');
+      if (storedTimesString === null) {
+        localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
+        setGenerateTimes(MAX_GENERATE_TIMES);
+      } else {
+        setGenerateTimes(Number(storedTimesString));
+      }
+    }
+  }, []);
 
   return (
 
@@ -117,7 +207,7 @@ const DiaryPage = () => {
 
       <div className="flex self-start items-center mb-4">
         <button
-          onClick={() => {}} //router 사용 예정이나, 현재 navigate와의 충돌 및 오류 문제로 구현 보류
+          onClick={() => { }} //router 사용 예정이나, 현재 navigate와의 충돌 및 오류 문제로 구현 보류
           className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
         >
           ←
@@ -145,19 +235,19 @@ const DiaryPage = () => {
       <div className="flex flex-grow items-center justify-center">
         <div className="w-2/5 flex flex-col items-center justify-center pr-4">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">{date}</h1> {/* 날짜 표시 수정 */}
-          
+
           <div className="relative w-1/2">
-          <textarea
-            value={content}
-            onChange={handleContentChange}
-            maxLength={MAX_CONTENT_LENGTH}
-            placeholder="일기를 작성하세요..."
-            className="w-full h-96 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
-          />
-          <div className="absolute right-3 bottom-3 text-xs text-gray-400">
-            {`${content.length}/${MAX_CONTENT_LENGTH}`}
+            <textarea
+              value={content}
+              onChange={handleContentChange}
+              maxLength={MAX_CONTENT_LENGTH}
+              placeholder="일기를 작성하세요..."
+              className="w-full h-96 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
+            />
+            <div className="absolute right-3 bottom-3 text-xs text-gray-400">
+              {`${content.length}/${MAX_CONTENT_LENGTH}`}
+            </div>
           </div>
-        </div>
 
           <div className="flex justify-center mb-6">
             {[
@@ -179,19 +269,25 @@ const DiaryPage = () => {
 
 
           <button
-            onClick={aiMode ? handleGenerateImage_AI : handleGenerateImage}
+            onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage}
             className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
           >
-            그림 생성
+            그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
+          </button>
+          <button
+            onClick={() => { setGenerateTimes(MAX_GENERATE_TIMES); localStorage.setItem('generateTimes', MAX_GENERATE_TIMES) }}
+            className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
+          >
+            생성 횟수 회복 (개발자용)
           </button>
           <div className="flex">
             <input
               type="checkbox"
               className="mr-2 cursor-pointer"
-              checked={aiMode}
-              onChange={handleAiModeChange}
+              checked={dummyMode}
+              onChange={handleDummyModeChange}
             />
-            <p className="text-lg font-bold text-gray-800">AI로 그림 생성(미선택 시 무작위로 더미 사진 생성)</p>
+            <p className="text-lg font-bold text-gray-800">더미 사진 생성</p>
           </div>
         </div>
         <div className="w-3/5 h-1/2 flex flex-col items-center justify-center pr-5">
