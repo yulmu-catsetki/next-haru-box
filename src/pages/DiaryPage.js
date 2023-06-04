@@ -4,7 +4,8 @@ import { getStorage } from 'firebase/storage';
 import { db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 // import { useSession } from "next-auth/react"; 아직 구현 안됨
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
+
 function useMockSession() { // 카카오톡 로그인 세션 정보
   return {
     data: {
@@ -20,7 +21,7 @@ function useMockSession() { // 카카오톡 로그인 세션 정보
 }
 const DiaryPage = () => {
 
-  
+  const router = useRouter();
 
   // const router = useRouter();
   const { data: session, status } = useMockSession()  // 원래는 useSession();

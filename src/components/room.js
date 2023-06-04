@@ -1,39 +1,44 @@
-import { OrthographicCamera, useGLTF,useScroll } from "@react-three/drei";
+import { OrthographicCamera, useGLTF, useScroll } from "@react-three/drei";
+
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
-import React, { useLayoutEffect, useRef,useState  } from "react";
-import * as THREE from 'three';
-import { useNavigate } from "react-router-dom";
-import styles from './Room.module.css';
+import React, { useLayoutEffect, useRef, useState } from "react";
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+  redirect,  
+  notFound,
+} from 'next/navigation';
+import styles from "./Room.module.css";
 
 export function Room(props) {
-  const { nodes, materials } = useGLTF("./models/room.glb");
+  const { nodes, materials } = useGLTF("/models/final.glb");
   const ref = useRef(null);
   const tl = useRef(null);
   const diaryMesh = useRef(null);
   const [isDiaryHovered, setIsDiaryHovered] = useState(false);
 
-  const diaryPosition =nodes["diary"].position;
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const scroll = useScroll();
 
   useFrame(() => {
-    if(tl.current){
+    if (tl.current) {
       tl.current.seek(scroll.offset * tl.current.duration());
     }
-    
-
   });
 
   const handleDiaryClick = () => {
     console.log("Diary clicked");
-    navigate("/diary");
+    router.push("/DiaryPage");
   };
 
   const handleDashboardClick = () => {
     console.log("Dashboard clicked");
-    navigate("/dashboard");
+    router.push("/DashboardPage");
   };
 
   const handleDiaryMouseOver =() =>{
@@ -50,7 +55,7 @@ export function Room(props) {
   const handleDiaryMouseLeave =() =>{
     console.log("leave");
     setIsDiaryHovered(false);
-    //diaryPosition.current.z -= 0.01;
+
     if(tl.current){
       tl.current.to(diaryMesh.current.rotation, { duration: 1, y: Math.PI * 2 });
     }
@@ -76,7 +81,7 @@ export function Room(props) {
 
 // ...
 }, []);
-// Separate useFrame for diary mesh rotation
+
 useFrame(() => {
   if (diaryMesh.current) {
     diaryMesh.current.rotation.y += 0.01;
@@ -88,36 +93,22 @@ useFrame(() => {
 return (
   
 <group {...props} dispose={null} ref={ref}>
-<mesh
-geometry={nodes["diary"].geometry}
-material={nodes["diary"].material}
-position={diaryPosition}
-rotation={nodes["diary"].rotation}
-scale={nodes["diary"].scale}
-onClick={handleDiaryClick}
-onPointerOver={handleDiaryMouseOver}
-onPointerLeave={handleDiaryMouseLeave}
-ref={diaryMesh}
-pointerEvents="auto"
-/> 
-  <mesh
-
-    geometry={nodes["dashboard"].geometry}
-    material={nodes["dashboard"].material}
-    position={nodes["dashboard"].position}
-    rotation={nodes["dashboard"].rotation}
-    scale={nodes["dashboard"].scale}
-    onClick={handleDashboardClick}
-
-  />
-  <mesh
-    geometry={nodes["room"].geometry}
-    material={nodes["room"].material}
-    position={nodes["room"].position}
-    rotation={nodes["room"].rotation}
-    scale={nodes["room"].scale}
-
-  />
+{Object.entries(nodes).map(([name, node], index) => (
+        <mesh
+          key={index}
+          geometry={node.geometry}
+          material={node.material}
+          position={node.position}
+          rotation={node.rotation}
+          scale={node.scale}
+          onClick={name === "dashboard" ? handleDashboardClick : undefined}
+          //onClick={name === "diary" ? handleDiaryClick : undefined}
+          //onPointerOver={name === "diary" ? handleDiaryMouseOver : undefined}
+          //onPointerLeave={name === "diary" ? handleDiaryMouseLeave : undefined}
+          //ref={name === "diary" ? diaryMesh : undefined}
+          //pointerEvents={name === "diary" ? "auto" : "none"}
+        />
+      ))}
   
 </group>
 
@@ -125,4 +116,6 @@ pointerEvents="auto"
 );
 }
 
+
 useGLTF.preload("./models/room.glb");
+

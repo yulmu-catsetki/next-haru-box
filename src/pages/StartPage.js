@@ -1,12 +1,21 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+  redirect,  
+  notFound,
+} from 'next/navigation';
+
 
 const StartPage = () => {
-const navigate = useNavigate();
+  const router = useRouter();
 
   const handleLogin = () => {
-    
-    navigate('/main'); //일단 임시로 이렇게 둠 
+    router.push('/MainPage'); // Navigate to the '/main' page
   };
 
   return (
@@ -18,3 +27,4 @@ const navigate = useNavigate();
 };
 
 export default StartPage;
+

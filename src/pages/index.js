@@ -1,17 +1,25 @@
-import React, { useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
+import React, { useState } from 'react';
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import StartPage from './StartPage';
+import MainPage from './MainPage';
+import DiaryPage from './DiaryPage';
+import DashboardPage from './DashboardPage';
 
-const Index = () => {
-  useEffect(() => {
-    const container = document.getElementById('App');
-    if (container) {
-      const root = createRoot(container);
-      root.render(<App tab="home" />);
-    }
-  }, []);
+export default function Home() {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-  return <div id="App" />;
-};
+  return (
+    <div className="App">
+      <h1>3D Website</h1>
+      {router.pathname === '/' && <StartPage setIsLoggedIn={setIsLoggedIn} />}
+      {isLoggedIn && router.pathname.startsWith('/MainPage') && <MainPage />}
+      {router.pathname === '/DiaryPage' && <DiaryPage />}
+      {router.pathname === '/DashboardPage' && <DashboardPage />}
+    </div>
+  );
+}
 
-export default Index;
+
+

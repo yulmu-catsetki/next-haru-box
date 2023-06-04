@@ -1,7 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { Experience } from "../components/Experience.js";
 import { Canvas } from "@react-three/fiber";
-import { useNavigate } from "react-router-dom";
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+  redirect,  
+  notFound,
+} from 'next/navigation';
 import { OrthographicCamera } from "@react-three/drei";
 import { db } from "../firebase";
 import {
@@ -11,17 +19,18 @@ import {
   getDocs,
   orderBy
 } from "firebase/firestore";
-const MainPage = () => {
 
-  const navigate = useNavigate();
+const MainPage = () => {
+  const router = useRouter();
+
   const handleDiaryClick = () => {
-    navigate("/diary");
+    router.push("/DiaryPage");
     console.log("Diary object clicked");
     // Perform any other desired actions
   };
 
   const handleDashboardClick = () => {
-    navigate("/dashboard");
+    router.push("/DashboardPage");
     console.log("Dashboard object clicked");
     // Perform any other desired actions
   };
@@ -43,19 +52,14 @@ const MainPage = () => {
   return (
     <div style={{ position: "relative", width: 1000, height: 1000 }}>
       <h1>Main Page</h1>
-      <Canvas
-      orthographic
-        camera={{
-          zoom: 100,
-          position: [0, 0, 10],
-          near: 0.1,
-          far: 1000,
-        }}>
-       <OrthographicCamera makeDefault position={[0, 0, 10]} zoom={10} near={0.1} far={1000} />
-      <Experience />
-    </Canvas>
+      <Canvas orthographic camera={{ zoom: 200, position: [0, 0, 10], near: 0.1, far: 1000 }}>
+        <OrthographicCamera makeDefault position={[0, 0, 10]} zoom={10} near={0.1} far={1000} />
+        <Experience handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
+      </Canvas>
     </div>
   );
 };
+
+
 
 export default MainPage;
