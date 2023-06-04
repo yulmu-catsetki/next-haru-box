@@ -33,7 +33,9 @@ const DiaryPage = () => {
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
   const [content, setContent] = useState('');
   const [emotion, setEmotion] = useState(1);
-  const [imgUrl, setImgUrl] = useState('');
+
+  const [imgUrl, setImgUrl] = useState(''); // 임시 URL. 화면 표시용
+  const [imgB64, setImgB64] = useState(''); // base64문자열. 사진 저장용
 
   // 남은 생성 횟수
   const [generateTimes, setGenerateTimes] = useState(MAX_GENERATE_TIMES);
@@ -46,68 +48,72 @@ const DiaryPage = () => {
       alert('로그인이 필요합니다!');
       return;
     }
-  
+
     if (content.trim() === '') {
       alert('일기 내용을 입력하세요!');
       return;
     }
-  
+
+    if (imgUrl.trim() === '') {
+      alert('그림을 생성하세요!');
+      return;
+    }
+
     // Firebase Storage와 Firestore 초기화
     const storage = getStorage(); // Firebase Storage 인스턴스
     const userDiariesCollection = collection(db, 'users', session.user.id, 'diaries');
-  
-    const response = await axios.post('/api/dream', { style_id: 96, prompt: content, target_img_path: null });
-    const blob = b64toBlob(response.data.imgBlob, 'image/jpeg');
-  
+
+    const blob = b64toBlob(imgB64, 'image/jpeg');
+
     // 기존 내용을 덮어쓰는 것을 방지하기 위해 파일에 대해 고유한 이름 생성
     const fileName = `${Date.now()}-${session?.user?.name}`;
-  
+
     // Firebase Storage에 파일에 대한 참조 생성
     const storageRef = ref(storage, fileName);
-  
+
     try {
-  
+
       // 파일을 Firebase Storage에 업로드
       const snapshot = await uploadBytesResumable(storageRef, blob);
-  
+
       // 파일에 대한 다운로드 URL 가져오기
       const url = await getDownloadURL(snapshot.ref);
-  
+
       // 이미지 URL이 포함된 일기 객체 생성
       const diary = { content, emotion, date: serverTimestamp(), imgUrl: url };
-  
+
       // 일기를 Firestore에 저장
       await addDoc(userDiariesCollection, diary);
-  
+
       console.log('Diary successfully written!');
       alert('일기가 정상적으로 저장되었습니다.');
     } catch (e) {
       console.error('Error writing document: ', e);
     }
-  
+
     setContent('');
     setEmotion(1);
     setImgUrl(null);
   };
-  
+
   // base64를 Blob으로 변환하는 함수
-  function b64toBlob(b64Data, contentType='', sliceSize=512) {
+  function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];
-  
+
     for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
       const slice = byteCharacters.slice(offset, offset + sliceSize);
-  
+
       const byteNumbers = new Array(slice.length);
       for (let i = 0; i < slice.length; i++) {
         byteNumbers[i] = slice.charCodeAt(i);
       }
-  
+
       const byteArray = new Uint8Array(byteNumbers);
       byteArrays.push(byteArray);
     }
-  
-    const blob = new Blob(byteArrays, {type: contentType});
+
+    const blob = new Blob(byteArrays, { type: contentType });
     return blob;
   }
 
@@ -260,15 +266,12 @@ const DiaryPage = () => {
     if (!canGenerateImage()) { return; }
 
     try {
-      const res = await axios.post('/api/dream', {
-        style_id: 96,
-        prompt: content,
-        target_img_path: null
-      });
+      const res = await axios.post('/api/dream', { style_id: 96, prompt: content, target_img_path: null });
 
       console.log("응답 데이터: ", res.data);
-      console.log("응답 데이터 URL: ", res.dataimageUrl);
+
       setImgUrl(res.data.imageUrl);
+      setImgB64(res.data.imgB64);
 
     } catch (error) {
       console.error(error);

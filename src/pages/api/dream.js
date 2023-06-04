@@ -69,12 +69,12 @@ export default async (req, res) => {
                     responseType: 'arraybuffer',
                 });
 
-                const imgBlob = Buffer.from(imageResponse.data, 'binary').toString('base64');  // Blob 생성
+                const imgB64 = Buffer.from(imageResponse.data, 'binary').toString('base64');  // Blob 생성
 
                 res.status(200).json({
                     message: 'Image generation done!',
                     imageUrl: get_Response.data.result,
-                    imgBlob // Blob을 base64 문자열로 저장
+                    imgB64 // Blob을 base64 문자열로 저장
                 });
 
                 console.log('Generated image downloaded to img.jpg! enjoy :)');
