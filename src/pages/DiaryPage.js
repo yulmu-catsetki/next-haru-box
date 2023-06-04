@@ -73,23 +73,29 @@ const DiaryPage = () => {
     setEmotion(1);
     setImgUrl(null);
   };
+
+  const checkAndResetGenerateTimes = () => {
+    const storedDate = localStorage.getItem('generateDate');
+    const currentDate = new Date().toLocaleDateString();
+
+    console.log("checkAndResetGenerateTimes");
+
+    if (storedDate !== currentDate) {
+      console.log("resetToken");
+
+      localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
+      localStorage.setItem('generateDate', currentDate);
+      setGenerateTimes(MAX_GENERATE_TIMES);
+    }
+  };
+
   const handleGenerateImage_Dummy = () => {
-
-    
-    // 날짜가 바뀌었는지 확인하고 횟수를 재설정하는 함수
-    const checkAndResetGenerateTimes = () => {
-      const storedDate = localStorage.getItem('generateDate');
-      const currentDate = new Date().toLocaleDateString();
-
-      if (storedDate !== currentDate) {
-        localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
-        localStorage.setItem('generateDate', currentDate);
-        setGenerateTimes(MAX_GENERATE_TIMES);
-      }
-    };
 
     // 그림 생성 전에 로컬 스토리지를 확인하고 제한 횟수를 확인하는 함수
     const canGenerateImage = () => {
+
+      console.log("canGenerateImage");
+
       checkAndResetGenerateTimes();
 
       let storedTimes = Number(localStorage.getItem('generateTimes'));
@@ -195,18 +201,6 @@ const DiaryPage = () => {
 
     console.log("prompt: " + content);
 
-    // 날짜가 바뀌었는지 확인하고 횟수를 재설정하는 함수
-    const checkAndResetGenerateTimes = () => {
-      const storedDate = localStorage.getItem('generateDate');
-      const currentDate = new Date().toLocaleDateString();
-
-      if (storedDate !== currentDate) {
-        localStorage.setItem('generateTimes', MAX_GENERATE_TIMES);
-        localStorage.setItem('generateDate', currentDate);
-        setGenerateTimes(MAX_GENERATE_TIMES);
-      }
-    };
-
     // 그림 생성 전에 로컬 스토리지를 확인하고 제한 횟수를 확인하는 함수
     const canGenerateImage = () => {
       checkAndResetGenerateTimes();
@@ -247,6 +241,7 @@ const DiaryPage = () => {
   const handleDummyModeChange = () => setDummyMode(!dummyMode);
 
   useEffect(() => {
+
     if (typeof localStorage !== 'undefined') {
       const storedTimesString = localStorage.getItem('generateTimes');
       if (storedTimesString === null) {
@@ -256,6 +251,8 @@ const DiaryPage = () => {
         setGenerateTimes(Number(storedTimesString));
       }
     }
+
+    checkAndResetGenerateTimes();
   }, []);
 
   return (
@@ -346,7 +343,6 @@ const DiaryPage = () => {
             />
             <p className="text-lg font-bold text-gray-800">더미 사진 생성</p>
           </div>
-    
         </div>
         <div className="w-3/5 h-1/2 flex flex-col items-center justify-center pr-5">
 
