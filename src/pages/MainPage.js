@@ -3,6 +3,14 @@ import { Experience } from "../components/Experience.js";
 import { Canvas } from "@react-three/fiber";
 import { useNavigate } from "react-router-dom";
 import { OrthographicCamera } from "@react-three/drei";
+import { db } from "../firebase";
+import {
+  collection,
+  query,
+  doc,
+  getDocs,
+  orderBy
+} from "firebase/firestore";
 const MainPage = () => {
 
   const navigate = useNavigate();
@@ -17,7 +25,20 @@ const MainPage = () => {
     console.log("Dashboard object clicked");
     // Perform any other desired actions
   };
-  
+
+  const getEmotion = async () => {  
+    const diaryCollection = collection(db, "users", "dummy-id", "diaries");
+    const q = query(
+      diaryCollection,
+      orderBy('date', 'desc')
+    );
+    const result = await getDocs(q);
+    const emotion = result.docs[0].data().emotion;
+  }
+
+  useEffect(() => {
+    getEmotion();
+  }, []);
 
   return (
     <div style={{ position: "relative", width: 1000, height: 1000 }}>
