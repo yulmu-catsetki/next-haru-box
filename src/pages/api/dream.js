@@ -63,17 +63,25 @@ export default async (req, res) => {
                 console.log('failed!');
                 break;
             } else if (state === 'completed') {
-                // console.log(get_Response.data);
+
+                const finalUrl = get_Response.data.result;
+                const imageResponse = await axios.get(finalUrl, {
+                    responseType: 'arraybuffer',
+                });
+
+                const imgBlob = Buffer.from(imageResponse.data, 'binary').toString('base64');  // Blob 생성
+
+                res.status(200).json({
+                    message: 'Image generation done!',
+                    imageUrl: get_Response.data.result,
+                    imgBlob // Blob을 base64 문자열로 저장
+                });
+
                 console.log('Generated image downloaded to img.jpg! enjoy :)');
                 break;
             }
             await new Promise((resolve) => setTimeout(resolve, 4000));
         }
-
-        res.status(200).json({
-            message: 'Image generation done!',
-            imageUrl: get_Response.data.result,
-        });
 
     } catch (error) {
         console.error(error);
