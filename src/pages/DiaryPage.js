@@ -23,8 +23,6 @@ function useMockSession() { // 카카오톡 로그인 세션 정보
 const DiaryPage = () => {
 
   const router = useRouter();
-
-  // const router = useRouter();
   const { data: session, status } = useSession();
 
   const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
@@ -303,7 +301,7 @@ const DiaryPage = () => {
 
       <div className="flex self-start items-center mb-4">
         <button
-          onClick={() => { }} //router 사용 예정이나, 현재 navigate와의 충돌 및 오류 문제로 구현 보류
+          onClick={() => router.push('/MainPage')}
           className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
         >
           ←
