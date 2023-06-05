@@ -7,19 +7,6 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
-function useMockSession() { // 카카오톡 로그인 세션 정보
-  return {
-    data: {
-      user: {
-        name: '민준세수',
-        email: 'dummy@domain.com',
-        image: 'https://media.discordapp.net/attachments/1100237467619180624/1100239612053553152/IMG_7276.png?width=676&height=676',
-        id: 'dummy-id',
-      },
-    },
-    status: 'authenticated',
-  };
-}
 const DiaryPage = () => {
 
   const router = useRouter();
@@ -28,6 +15,7 @@ const DiaryPage = () => {
   const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
   const MAX_GENERATE_TIMES = 5; // 하루에 생성할 수 있는 그림의 최대 횟수
 
+  const [isLoading, setLoading] = useState(false);
 
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
   const [content, setContent] = useState('');
@@ -58,6 +46,8 @@ const DiaryPage = () => {
       return;
     }
 
+    setLoading(true);  // 로딩 시작
+
     // Firebase Storage와 Firestore 초기화
     const storage = getStorage(); // Firebase Storage 인스턴스
     const userDiariesCollection = collection(db, 'users', session.user.id, 'diaries');
@@ -65,7 +55,7 @@ const DiaryPage = () => {
     const blob = b64toBlob(imgB64, 'image/jpeg');
 
     // 기존 내용을 덮어쓰는 것을 방지하기 위해 파일에 대해 고유한 이름 생성
-    const fileName = `${Date.now()}-${session?.user?.name}`;
+    const fileName = `${content.substring(0, 20)}_${session?.user?.name}_${Date.now()}`;
 
     // Firebase Storage에 파일에 대한 참조 생성
     const storageRef = ref(storage, fileName);
@@ -81,6 +71,7 @@ const DiaryPage = () => {
       // 이미지 URL이 포함된 일기 객체 생성
       const diary = { content, emotion, date: serverTimestamp(), imgUrl: url };
 
+      console.log('저장된 imgB64: ' + imgB64);
       // 일기를 Firestore에 저장
       await addDoc(userDiariesCollection, diary);
 
@@ -88,11 +79,14 @@ const DiaryPage = () => {
       alert('일기가 정상적으로 저장되었습니다.');
     } catch (e) {
       console.error('Error writing document: ', e);
+    } finally {
+      setLoading(false); // 로딩 끝
     }
 
     setContent('');
     setEmotion(1);
-    setImgUrl(null);
+    setImgUrl('');
+    setImgB64('');
   };
 
   // base64를 Blob으로 변환하는 함수
@@ -265,15 +259,18 @@ const DiaryPage = () => {
     if (!canGenerateImage()) { return; }
 
     try {
+
+      setLoading(true); // 로딩 시작
       const res = await axios.post('/api/dream', { style_id: 96, prompt: content, target_img_path: null });
 
       console.log("응답 데이터: ", res.data);
 
       setImgUrl(res.data.imageUrl);
       setImgB64(res.data.imgB64);
-
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false); // 로딩 완료
     }
   };
   const handleContentChange = (e) => setContent(e.target.value);
@@ -297,7 +294,15 @@ const DiaryPage = () => {
 
   return (
 
-    <div className="flex min-h-screen flex-col bg-gray-100 p-4">
+    <div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
+      {isLoading && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10 }}>
+          <div className="loader">
+            <div className="spinner"></div>
+          </div>
+        </div>
+      )}
+
 
       <div className="flex self-start items-center mb-4">
         <button
@@ -407,8 +412,6 @@ const DiaryPage = () => {
           >
             일기 저장
           </button>
-
-
         </div>
       </div>
     </div>
