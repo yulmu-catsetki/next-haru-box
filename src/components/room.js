@@ -16,9 +16,10 @@ import styles from "./Room.module.css";
 
 export function Room(props) {
   const { nodes, materials } = useGLTF("/models/final.glb");
+  
   const ref = useRef(null);
   const tl = useRef(null);
-  const diaryMesh = useRef(null);
+
   const [isDiaryHovered, setIsDiaryHovered] = useState(false);
 
   const router = useRouter();
@@ -38,13 +39,13 @@ export function Room(props) {
 
   const handleDashboardClick = () => {
     console.log("Dashboard clicked");
-    router.push("/DashboardPage");
+
+    //router.push("/DashboardPage");
   };
 
   const handleDiaryMouseOver =() =>{
     console.log("over");
     setIsDiaryHovered(true);
-    //diaryPosition.current.z += 0.01;
     if(tl.current){
       tl.current.kill();
       tl.current = gsap.timeline();
@@ -62,6 +63,11 @@ export function Room(props) {
     
     
   }
+
+  const { nodes: diaryNodes, materials: diaryMaterials } = useGLTF("/models/diary.glb");
+  const diaryMeshes = Object.values(diaryNodes).filter((node) => node.type === "Mesh");
+
+
   useLayoutEffect(() => {
     if(tl.current){
     tl.current = gsap.timeline();
@@ -76,16 +82,14 @@ export function Room(props) {
     }
     Object.values(nodes).forEach((mesh) => {
       console.log(mesh.name, mesh.scale,mesh.position,mesh.rotation);
-
-});
+    });
+    
 
 // ...
 }, []);
 
 useFrame(() => {
-  if (diaryMesh.current) {
-    diaryMesh.current.rotation.y += 0.01;
-  }
+  
 });
 
 
@@ -107,6 +111,16 @@ return (
           //onPointerLeave={name === "diary" ? handleDiaryMouseLeave : undefined}
           //ref={name === "diary" ? diaryMesh : undefined}
           //pointerEvents={name === "diary" ? "auto" : "none"}
+        />
+      ))}
+      {diaryMeshes.map((diaryMesh, index) => (
+        <mesh
+          key={index}
+          geometry={diaryMesh.geometry}
+          material={diaryMaterials}
+          onClick={handleDiaryClick}
+          onPointerOver={handleDiaryMouseOver}
+          onPointerLeave={handleDiaryMouseLeave}
         />
       ))}
   

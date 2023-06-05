@@ -1,21 +1,23 @@
 import React from 'react';
 import { OrbitControls, ScrollControls } from "@react-three/drei";
-import { Room } from "./Room.js";
+import { Room } from "./room.js";
 
-import { Canvas, Group } from "@react-three/fiber";
+
 
 export function Experience({ handleDiaryClick, handleDashboardClick }) {
+
   return (
-    <group scale={[1, 1, 1]}>
+    <group scale={[1, 1, 1] }>
       <ambientLight intensity={1.6} />
-      <OrbitControls enableZoom={true} />
-      <ScrollControls  damping={0.2}>
+      <OrbitControls enableZoom={true} key={true}/>
+      <ScrollControls  damping={0.5}>
         
         <Room
           handleDiaryClick={handleDiaryClick}
           handleDashboardClick={handleDashboardClick}
         />
       </ScrollControls>
+      
     </group>
   );
 }

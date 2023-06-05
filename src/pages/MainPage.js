@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect,useRef,useState   } from 'react';
 import { Experience } from "../components/Experience.js";
-import { Canvas } from "@react-three/fiber";
+import { Canvas,useFrame } from "@react-three/fiber";
+import CameraControls from '../components/CameraControls';
 import {
   usePathname,
   useRouter,
@@ -10,7 +11,7 @@ import {
   redirect,  
   notFound,
 } from 'next/navigation';
-import { OrthographicCamera } from "@react-three/drei";
+import { OrthographicCamera, Shadow } from "@react-three/drei";
 import { db } from "../firebase";
 import {
   collection,
@@ -20,19 +21,25 @@ import {
   orderBy
 } from "firebase/firestore";
 
+
+
+
+
 const MainPage = () => {
   const router = useRouter();
 
-  const handleDiaryClick = () => {
-    router.push("/DiaryPage");
-    console.log("Diary object clicked");
-    // Perform any other desired actions
+  const [dashboardClicked, setDashboardClicked] = useState(false);
+  const [cameraPosition, setCameraPosition] = useState([2.56529, 2.20877, -2.05944]);
+  const handleDashboardClick = () => {
+    console.log("Dashboard clicked");
+    setDashboardClicked(true);
   };
 
-  const handleDashboardClick = () => {
-    router.push("/DashboardPage");
-    console.log("Dashboard object clicked");
-    // Perform any other desired actions
+  const handleCameraUpdate = (camera) => {
+    // Manipulate the camera as desired
+    //camera.rotation.x += 0.01;
+    //camera.rotation.y += 0.01;
+    //camera.rotation.z += 0.01;
   };
 
   const getEmotion = async () => {  
@@ -44,17 +51,20 @@ const MainPage = () => {
     const result = await getDocs(q);
     const emotion = result.docs[0].data().emotion;
   }
-
+ 
+  
   useEffect(() => {
     getEmotion();
   }, []);
+  
 
+  const cameraRef = useRef();
   return (
-    <div style={{ position: "relative", width: 1000, height: 1000 }}>
+    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
       <h1>Main Page</h1>
-      <Canvas orthographic camera={{ zoom: 200, position: [0, 0, 10], near: 0.1, far: 1000 }}>
-        <OrthographicCamera makeDefault position={[0, 0, 10]} zoom={10} near={0.1} far={1000} />
-        <Experience handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
+      <Canvas orthographic camera={{ zoom: 150, position: cameraPosition }}>
+        <CameraControls onCameraUpdate={handleCameraUpdate} handleDashboardClick={handleDashboardClick} />
+        
       </Canvas>
     </div>
   );
