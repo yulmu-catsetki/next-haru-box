@@ -11,11 +11,23 @@ import {
 } from 'next/navigation';
 
 
-const StartPage = () => {
-  const router = useRouter();
+export default function StartPage() {
 
-  const handleLogin = () => {
-    router.push('/MainPage'); // Navigate to the '/main' page
+  const router = useRouter();
+  const handleLogin = async () => {
+    try {
+      const result = await signIn('kakao', {
+        callbackUrl: 'http://localhost:3000/api/auth/callback/kakao',
+      });
+
+      if (result.error) {
+        console.log('Login failed:', result.error);
+      } else {
+        navigate('/main');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -24,7 +36,5 @@ const StartPage = () => {
       <button onClick={handleLogin}>Login</button>
     </div>
   );
-};
-
-export default StartPage;
+}
 
