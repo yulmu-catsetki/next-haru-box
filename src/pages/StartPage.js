@@ -1,16 +1,24 @@
 import React from 'react';
+import { signIn } from 'next-auth/react';
 import { useNavigate } from 'react-router-dom';
 
-const StartPage = () => {
-const navigate = useNavigate();
+export default function StartPage() {
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    
+  const handleLogin = async () => {
+    try {
+      const result = await signIn('kakao', {
+        callbackUrl: 'http://localhost:3000/api/auth/callback/kakao',
+      });
 
-    // Implement login functionality using Kakao API
-    // Set user authentication status or access token
-    // Navigate to the Main Page upon successful login
-    navigate('/main'); //일단 임시로 이렇게 둠 
+      if (result.error) {
+        console.log('Login failed:', result.error);
+      } else {
+        navigate('/main');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -19,6 +27,4 @@ const navigate = useNavigate();
       <button onClick={handleLogin}>Login</button>
     </div>
   );
-};
-
-export default StartPage;
+}
