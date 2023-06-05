@@ -3,8 +3,9 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/
 import "firebase/firestore";
 import { db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-// import { useSession } from "next-auth/react"; 아직 구현 안됨
+import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 function useMockSession() { // 카카오톡 로그인 세션 정보
   return {
@@ -24,7 +25,7 @@ const DiaryPage = () => {
   const router = useRouter();
 
   // const router = useRouter();
-  const { data: session, status } = useMockSession()  // 원래는 useSession();
+  const { data: session, status } = useSession();
 
   const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
   const MAX_GENERATE_TIMES = 5; // 하루에 생성할 수 있는 그림의 최대 횟수
