@@ -9,31 +9,33 @@ import {
   redirect,  
   notFound,
 } from 'next/navigation';
-
+import { useSession } from "next-auth/react";
 
 export default function StartPage() {
-
   const router = useRouter();
-  const handleLogin = async () => {
-    try {
-      const result = await signIn('kakao', {
-        callbackUrl: 'http://localhost:3000/api/auth/callback/kakao',
-      });
+  const { data: session } = useSession();
 
-      if (result.error) {
-        console.log('Login failed:', result.error);
-      } else {
-        navigate('/main');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
+  React.useEffect(() => {
+    if (!session) {
+      router.push('/auth/signin');
     }
-  };
+  }, [session, router]);
 
+  const handleMoveToMainPage = () => {
+    router.push('/MainPage'); 
+  };
   return (
     <div>
       <h1>Start Page</h1>
-      <button onClick={handleLogin}>Login</button>
+      {session ? (
+        <>
+        <p>Welcome, {session.user.name}!</p>
+        <button onClick={handleMoveToMainPage}>Go to MainPage</button>
+        </>
+      
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 }
