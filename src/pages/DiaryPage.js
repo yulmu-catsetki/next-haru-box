@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 // import { useSession } from "next-auth/react"; 아직 구현 안됨
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 function useMockSession() { // 카카오톡 로그인 세션 정보
   return {
