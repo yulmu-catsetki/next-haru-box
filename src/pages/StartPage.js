@@ -17,7 +17,7 @@ export default function StartPage() {
 
   React.useEffect(() => {
     if (!session) {
-      router.push('/auth/signin');
+      //router.push('/auth/signin');
     }
   }, [session, router]);
 
