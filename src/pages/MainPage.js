@@ -73,6 +73,7 @@ const MainPage = () => {
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
       <h1>Main Page</h1>
+      <button onClick={() => router.push('/DiaryPage')}>[Diary]</button>
       <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }}>
         <CameraControls onCameraUpdate={handleCameraUpdate} handleDashboardClick={handleDashboardClick} />
       </Canvas>
