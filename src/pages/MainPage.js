@@ -34,7 +34,7 @@ const MainPage = () => {
   }, [session?.user?.id, router]);
 
   const handleCameraUpdate = (camera) => {
-    if (dashboardClicked) {
+    /*if (dashboardClicked) {
       const targetPosition = new THREE.Vector3(0.04834, 0.30533, -0.73559);
       const startPosition = camera.position.clone();
   
@@ -58,13 +58,14 @@ const MainPage = () => {
           // Animation complete, update camera position and rotation
           setCameraPosition([0.04834, 0.30533, -0.73559]);
           camera.rotation.y = 2.25;
-          router.push('/DashboardPage');
+          //router.push('/DashboardPage');
         }
       };
   
       step(0);
     }
-    camera.zoom=2000;
+    camera.zoom=2000; */
+    
     
     // Manipulate the camera as desired
     //camera.rotation.x += 0.01;
