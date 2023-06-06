@@ -4,7 +4,7 @@ import { Experience } from "../components/Experience.js";
 import { OrbitControls, OrthographicCamera } from "@react-three/drei";
 import * as THREE from 'three'; // Import THREE object
 
-const CameraControls = ({ onCameraUpdate, handleDashboardClick }) => {
+const CameraControls = ({ diaries, onCameraUpdate, handleDashboardClick }) => {
   const camera = useRef();
 
   const handleDiaryClick = () => {
@@ -26,7 +26,7 @@ const CameraControls = ({ onCameraUpdate, handleDashboardClick }) => {
       near={0.1}
       far={1000}
     >
-      <Experience handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
+      <Experience diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
     </OrthographicCamera>
   );
 };

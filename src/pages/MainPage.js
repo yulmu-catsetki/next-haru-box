@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import { db } from '../firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import * as THREE from 'three';
+import { useSession } from 'next-auth/react';
+
+
+
+
 
 const MainPage = () => {
   const router = useRouter();
@@ -20,8 +25,16 @@ const MainPage = () => {
     
   };
 
+  const { data: session } = useSession();
+
+  React.useEffect(() => {
+    if (!session) {
+      //router.push('/auth/signin');
+    }
+  }, [session?.user?.id, router]);
+
   const handleCameraUpdate = (camera) => {
-    if (dashboardClicked) {
+    /*if (dashboardClicked) {
       const targetPosition = new THREE.Vector3(0.04834, 0.30533, -0.73559);
       const startPosition = camera.position.clone();
   
@@ -45,13 +58,14 @@ const MainPage = () => {
           // Animation complete, update camera position and rotation
           setCameraPosition([0.04834, 0.30533, -0.73559]);
           camera.rotation.y = 2.25;
-          router.push('/DashboardPage');
+          //router.push('/DashboardPage');
         }
       };
   
       step(0);
     }
-    camera.zoom=2000;
+    camera.zoom=2000; */
+    
     
     // Manipulate the camera as desired
     //camera.rotation.x += 0.01;
@@ -59,23 +73,35 @@ const MainPage = () => {
     // camera.rotation.z += 0.01;
   };
 
-  const getEmotion = async () => {
-    const diaryCollection = collection(db, 'users', 'dummy-id', 'diaries');
-    const q = query(diaryCollection, orderBy('date', 'desc'));
+  const [diaries, setDiaries] = useState([]);
+  const getDiaries = async () => {
+    if (!session || !session.user || !session.user.id) {
+      // Handle the case when session or session.user or session.user.id is undefined
+      return;
+    }
+  
+    const diaryCollection = collection(db, 'users', session.user.id, 'diaries');
+    const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
-    const emotion = result.docs[0].data().emotion;
+  
+    const fetchedDiaries = result.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+    setDiaries(fetchedDiaries);
   };
-
+  
   useEffect(() => {
-    getEmotion();
-  }, []);
+    if (session) {
+      getDiaries();
+    }
+  }, [session]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
       <h1>Main Page</h1>
-      <button onClick={() => router.push('/DiaryPage')}>[Diary]</button>
       <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }}>
-        <CameraControls onCameraUpdate={handleCameraUpdate} handleDashboardClick={handleDashboardClick} />
+        <CameraControls diaries={diaries}  onCameraUpdate={handleCameraUpdate} handleDashboardClick={handleDashboardClick}>
+        </CameraControls>
       </Canvas>
     </div>
   );

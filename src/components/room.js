@@ -17,7 +17,7 @@ export function Room({ handleDashboardClick }) {
 
   const handleDiaryClick = () => {
     console.log('Diary clicked');
-    router.push('/DiaryPage');
+    //router.push('/DiaryPage');
   };
 
   const handleDiaryMouseOver = () => {

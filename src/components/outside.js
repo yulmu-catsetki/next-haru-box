@@ -6,7 +6,7 @@ import { useGLTF, Mask, useMask } from '@react-three/drei';
 function Rain() {
   const stencil = useMask(1, false);
   const { nodes } = useGLTF('/models/rain.glb');
-
+  const texture = new THREE.TextureLoader().load( "/models/sunny.jpg" );
   // Map through all the nodes and return a mesh for each one
   return Object.entries(nodes).map(([name, node], index) => (
     <mesh
@@ -14,11 +14,13 @@ function Rain() {
       geometry={node.geometry}
       castShadow
       receiveShadow
+      
       position={node.position} // Use the original position of each node
       rotation={node.rotation} // Use the original rotation of each node
       scale={node.scale} // Use the original scale of each node
     >
-      <meshPhongMaterial color="#000000" {...stencil} />
+    <meshPhongMaterial map={texture} {...stencil}/>
+
     </mesh>
   ));
 }
