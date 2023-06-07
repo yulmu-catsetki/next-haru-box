@@ -84,7 +84,7 @@ export function DiaryObjects({ diaries }){
                   textureBack.repeat.set(1, 1); // Repeat the texture on the back side
 
 
-                  const position = [-0.5+(index % 4) * 0.35,0.5-Math.floor(index /4) * 0.25, -0.9];
+                  const position = [-0.5+(index % 4) * 0.35,0.55-Math.floor(index /4) * 0.25, -0.9];
 
                   const tmpBox = new THREE.BoxGeometry(0.3,0.2,0.01);
                   const frontMaterial = new THREE.MeshBasicMaterial({ map: textureFront });
