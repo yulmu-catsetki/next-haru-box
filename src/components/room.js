@@ -1,9 +1,10 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import gsap from 'gsap';
 import { usePathname, useRouter } from 'next/navigation';
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useAspect, useVideoTexture, useTexture } from '@react-three/drei';
 import styles from './Room.module.css';
+import 'tailwindcss/tailwind.css';
 
 export function Room({ handleDashboardClick }) {
   const { nodes, materials } = useGLTF('/models/final.glb');
@@ -12,6 +13,7 @@ export function Room({ handleDashboardClick }) {
   const tl = useRef(null);
 
   const [isDiaryHovered, setIsDiaryHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
 
@@ -40,23 +42,45 @@ export function Room({ handleDashboardClick }) {
   const { nodes: diaryNodes, materials: diaryMaterials } = useGLTF('/models/diary.glb');
   const diaryMeshes = Object.values(diaryNodes).filter((node) => node.type === 'Mesh');
 
-  
-
   useFrame(() => {});
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
 
   return (
     <group dispose={null} ref={ref}>
-      {Object.entries(nodes).map(([name, node], index) => (
-        <mesh
-          key={index}
-          geometry={node.geometry}
-          material={node.material}
-          position={node.position}
-          rotation={node.rotation}
-          scale={node.scale}
-          onClick={name === 'dashboard' ? handleDashboardClick : undefined}
-        />
-      ))}
+      {Object.entries(nodes).map(([name, node], index) => {
+        if (name === 'screen') {
+          return (
+            <React.Fragment key={index}>
+              {!isLoading ? (
+                <mesh
+                  geometry={node.geometry}
+                  material={<VideoMaterial url="/video/screen.mp4" />}
+                  position={node.position}
+                  rotation={node.rotation}
+                  scale={node.scale}
+                  onClick={name === 'dashboard' ? handleDashboardClick : undefined}
+                />
+              ) : null}
+              {isLoading ? <LoadingIndicator /> : null}
+            </React.Fragment>
+          );
+        } else {
+          return (
+            <mesh
+              key={index}
+              geometry={node.geometry}
+              material={node.material}
+              position={node.position}
+              rotation={node.rotation}
+              scale={node.scale}
+              onClick={name === 'dashboard' ? handleDashboardClick : undefined}
+            />
+          );
+        }
+      })}
       {diaryMeshes.map((diaryMesh, index) => (
         <mesh
           key={index}
@@ -68,6 +92,20 @@ export function Room({ handleDashboardClick }) {
         />
       ))}
     </group>
+  );
+}
+
+function VideoMaterial({ url }) {
+  const texture = useVideoTexture(url);
+  return <meshBasicMaterial map={texture} toneMapped={false} />;
+}
+
+function LoadingIndicator() {
+  return (
+    <mesh>
+      <planeGeometry  args={[1, 1]} />
+      <meshBasicMaterial color="red" />
+    </mesh>
   );
 }
 
