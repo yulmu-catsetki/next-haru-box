@@ -1,0 +1,6 @@
+@font-face {
+    font-family: 'CustomFont';
+    src: url('./나눔손글씨 부장님 눈치체.ttf') format('truetype');
+    /* Adjust the URL if the font file is in a different directory within the public folder */
+  }
+  

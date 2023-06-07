@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import { TextureLoader,RepeatWrapping } from 'three';
-
+import fontFile from '../public/나눔손글씨 부장님눈치체.ttf';
+import '../public/font.css';
 export function DiaryObjects({ diaries }){
   const ref = useRef(null);
   const [boxes, setBoxes] = useState([]);
@@ -44,7 +45,7 @@ export function DiaryObjects({ diaries }){
                 const emoji = emotionMap[diary.emotion] || '';
                 ctx.fillText(emoji, 30, 440);
 
-                ctx.font = '25px Arial';
+                ctx.font = '25px CustomFont';
                 ctx.fillStyle = 'black';
                 const maxLineWidth = 540; // Maximum width for a line of text
                 const lineHeight = 30; // Height of each line
