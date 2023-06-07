@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
-import { TextureLoader,RepeatWrapping } from 'three';
+import { TextureLoader, RepeatWrapping } from 'three';
 import '/public/font.css';
-export function DiaryObjects({ diaries }){
+
+export function DiaryObjects({ diaries }) {
   const ref = useRef(null);
   const [boxes, setBoxes] = useState([]);
 
@@ -13,19 +14,23 @@ export function DiaryObjects({ diaries }){
       3: '😭',
       4: '😡',
     };
-    
 
     const loadTextures = async () => {
       if (Array.isArray(diaries)) {
-        const loadedBoxes  = await Promise.all(
-          diaries.map((diary,index) =>
+        await document.fonts.ready; // Wait for the font to be loaded
+
+        const loadedBoxes = await Promise.all(
+          diaries.map((diary, index) =>
             new Promise((resolve) => {
               const canvas = document.createElement('canvas');
               canvas.width = 600; // Set the canvas width
               canvas.height = 800; // Set the canvas height
+              canvas.setAttribute('willReadFrequently', 'true');
               const ctx = canvas.getContext('2d');
               ctx.fillStyle = 'white';
               ctx.fillRect(0, 0, canvas.width, canvas.height);
+              ctx.font = '18px CustomFont'; // Set the font style to your custom font
+              ctx.fillStyle = 'white';
 
               const img = new Image();
               img.crossOrigin = 'anonymous';
@@ -35,16 +40,13 @@ export function DiaryObjects({ diaries }){
                 ctx.drawImage(img, 30, 20, 540, 360);
 
                 // Set the text style for date, emotion, and content
-                ctx.font = '18px Arial';
-                ctx.fillStyle = 'white';
-
                 const date = diary.date.toDate().toLocaleDateString('ko-KR');
                 ctx.fillText(date, 35, 40);
-                ctx.font = '25px Arial';
+                ctx.font = '25px CustomFont'; // Set the font style to your custom font
                 const emoji = emotionMap[diary.emotion] || '';
                 ctx.fillText(emoji, 30, 440);
 
-                ctx.font = '45px CustomFont';
+                ctx.font = '45px CustomFont'; // Set the font style to your custom font
                 ctx.fillStyle = 'black';
                 const maxLineWidth = 540; // Maximum width for a line of text
                 const lineHeight = 43; // Height of each line
@@ -83,10 +85,9 @@ export function DiaryObjects({ diaries }){
                   textureBack.wrapS = RepeatWrapping;
                   textureBack.repeat.set(1, 1); // Repeat the texture on the back side
 
+                  const position = [-0.5 + (index % 4) * 0.35, 0.55 - Math.floor(index / 4) * 0.25, -0.9];
 
-                  const position = [-0.5+(index % 4) * 0.35,0.55-Math.floor(index /4) * 0.25, -0.9];
-
-                  const tmpBox = new THREE.BoxGeometry(0.3,0.2,0.01);
+                  const tmpBox = new THREE.BoxGeometry(0.3, 0.2, 0.01);
                   const frontMaterial = new THREE.MeshBasicMaterial({ map: textureFront });
                   const backMaterial = new THREE.MeshBasicMaterial({ map: textureBack });
                   const sideMaterial = new THREE.MeshBasicMaterial({ color: 'white' });
@@ -97,32 +98,27 @@ export function DiaryObjects({ diaries }){
                     sideMaterial, // Top side
                     sideMaterial, // Bottom side
                     frontMaterial, // Front side
-                    backMaterial // Back side
-];
+                    backMaterial, // Back side
+                  ];
 
-                  const rotation =[0,0,0];
+                  const rotation = [0, 0, 0];
                   const handleCardClick = (event) => {
                     const clickedBox = event.object;
-                    const rotation = clickedBox.rotation;
-                    rotation.y += Math.PI;
+                    clickedBox.rotation.y += Math.PI;
                   };
+
                   const box = (
-                    <mesh 
-                      key={diary.id} 
+                    <mesh
+                      key={diary.id}
                       rotation={rotation}
                       position={position}
                       geometry={tmpBox}
                       material={materials}
-
                       onClick={handleCardClick}
                     />
                   );
 
                   resolve(box);
-
-
-
-            
                 });
               };
             })
@@ -135,6 +131,7 @@ export function DiaryObjects({ diaries }){
 
     loadTextures();
   }, [diaries]);
+
   const splitTextIntoLines = (text, ctx, maxLineWidth) => {
     const words = text.split(' ');
     const lines = [];
@@ -156,10 +153,5 @@ export function DiaryObjects({ diaries }){
     return lines;
   };
 
-
-
-
-  return (
-    <group>{boxes}</group>
-  );
+  return <group>{boxes}</group>;
 }
