@@ -11,7 +11,7 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
       <ambientLight intensity={1.6} />
       <OrbitControls enableZoom={true} />
       <ScrollControls  damping={0.5}>
-      <Outside/>
+      <Outside diaries={diaries}/>
       <DiaryObjects diaries={diaries} />
       <Room handleDashboardClick={handleDashboardClick} />
       </ScrollControls>
