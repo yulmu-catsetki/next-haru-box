@@ -9,12 +9,31 @@ import axios from 'axios';
 
 const DashboardPage = () => {
 
+  const COLUMN_NUM = 5; // 일기 배열 가로 크기
+  const ROW_NUM = 3; // 일기 배열 세로 크기
+
   const router = useRouter();
   const { data: session, status } = useSession();
 
   const [diaries, setDiaries] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [diaryToDelete, setDiaryToDelete] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  const addDummyDiary = () => {
+    const dummyDiary = {
+      id: `dummy-${Date.now()}`,
+      imgUrl: "https://firebasestorage.googleapis.com/v0/b/haru-box-test.appspot.com/o/mjss.png?alt=media&token=b269907e-6f86-41c6-b38b-a390cd088c62",
+      date: new Date(),
+      content: "오늘은 세수를 했다.",
+      emotion: 2,
+    };
+    console.log(paginatedDiaries);
+
+    setDiaries(prevDiaries => [...prevDiaries, dummyDiary]);
+  }
+
 
   const getDiaries = async () => {
     const diaryCollection = collection(db, "users", session.user.id, "diaries");
@@ -41,6 +60,29 @@ const DashboardPage = () => {
     }
   }
 
+  // 일기 페이지화 관련 부분
+
+  const [currentPage, setCurrentPage] = useState(1); // 현재 몇 번째 페이지인지
+  const [paginatedDiaries, setPaginatedDiaries] = useState([]); // 현재 페이지 일기만 모아둠
+
+  const itemsPerPage = COLUMN_NUM * ROW_NUM;
+  const totalPages = Math.ceil(diaries.length / itemsPerPage);
+
+  function paginateDiaries(diaries, itemsPerPage, currentPage) {
+    // 현재 페이지에 표시할 시작 인덱스와 끝 인덱스 계산
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    // 해당 범위의 일기들만 반환
+    return diaries.slice(startIndex, endIndex);
+  }
+
+  // Effect로 현재 페이지 일기 계속 반영
+  useEffect(() => {
+    const paginatedDiaries = paginateDiaries(diaries, itemsPerPage, currentPage);
+    setPaginatedDiaries(paginatedDiaries);
+  }, [diaries, currentPage]);
+
   const openModal = (id) => {
     setDiaryToDelete(id);
     setIsModalOpen(true);
@@ -49,16 +91,6 @@ const DashboardPage = () => {
   const closeModal = () => {
     setDiaryToDelete(null);
     setIsModalOpen(false);
-  }
-
-  const handleScrollLeft = () => {
-    const container = document.getElementById('diariesContainer');
-    container.scrollLeft -= 200; // Adjust the scroll distance as needed
-  }
-
-  const handleScrollRight = () => {
-    const container = document.getElementById('diariesContainer');
-    container.scrollLeft += 200; // Adjust the scroll distance as needed
   }
 
   useEffect(() => {
@@ -96,7 +128,73 @@ const DashboardPage = () => {
           )}
         </div>
       </div>
+      {/* 더미 데이터 추가 버튼 */}
+      <button
+        onClick={addDummyDiary}
+        className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 mb-4"
+      >
+        Add Dummy Diary
+      </button>
 
+      {/* 페이지네이션 컨트롤 */}
+      <div className="flex justify-center my-4">
+        {currentPage > 1 && (
+          <button
+            onClick={() => setCurrentPage(currentPage - 1)}
+            className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 mr-3"
+          >
+            Previous Page
+          </button>
+        )}
+        <span className="align-middle self-center mx-4 text-lg font-semibold text-blue-500">
+          Page {currentPage} of {totalPages}
+        </span>
+        {currentPage < totalPages && (
+          <button
+            onClick={() => setCurrentPage(currentPage + 1)}
+            className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 ml-3"
+          >
+            Next Page
+          </button>
+        )}
+      </div>
+
+      {/* 일기 그리드 */}
+      <div className={`grid grid-cols-${COLUMN_NUM} gap-4 px-20`}>
+        {paginatedDiaries && Array(itemsPerPage).fill(null).map((_, idx) => {
+          const diary = paginatedDiaries[idx];
+            return diary ? (
+            <div key={paginatedDiaries[idx].id} className="rounded overflow-hidden shadow-lg flex flex-col justify-between min-h-[24rem]">
+              <img className="w-full h-64 object-cover" src={diary.imgUrl} alt="Diary" />
+              <div className="px-6 py-4 flex-grow overflow-hidden">
+                <div className="font-bold text-xl mb-2">
+                  {diary.date instanceof Date ? diary.date.toLocaleDateString() : diary.date.toDate().toLocaleDateString()}
+                </div>
+                <p className="text-gray-700 text-base line-clamp-3 overflow-ellipsis">{diary.content}</p>
+              </div>
+              <div className="px-6 pt-4 pb-2 flex items-center justify-between">
+                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-lg font-bold text-gray-700 mr-2">
+                  {[
+                    '',   // No emotion
+                    '😐', // Neutral
+                    '😀', // Joy
+                    '😭', // Sadness
+                    '😡', // Anger
+                  ][diary.emotion]}
+                </span>
+                <button
+                  className="inline-block bg-red-200 rounded-full px-3 py-1 text-lg font-bold text-gray-700 mr-2"
+                  onClick={() => openModal(diary.id)}
+                >
+                  🗑
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div key={idx} className="rounded overflow-hidden shadow-lg flex items-center justify-center text-xl min-h-[24rem]">📝</div>
+          );
+        })}
+      </div>
       {isModalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
           <div className="flex items-center justify-center min-h-screen">
@@ -133,38 +231,7 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
-      <div className="grid grid-cols-5 gap-4 px-20">
-        {Array(15).fill(null).map((_, idx) => (
-          diaries[idx] ? (
-            <div key={diaries[idx].id} className="rounded overflow-hidden shadow-lg flex flex-col justify-between min-h-[24rem]">
-              <img className="w-full h-64 object-cover" src={diaries[idx].imgUrl} alt="Diary" />
-              <div className="px-6 py-4 flex-grow overflow-hidden">
-                <div className="font-bold text-xl mb-2">{diaries[idx].date.toDate().toLocaleDateString()}</div>
-                <p className="text-gray-700 text-base line-clamp-3 overflow-ellipsis">{diaries[idx].content}</p>
-              </div>
-              <div className="px-6 pt-4 pb-2 flex items-center justify-between">
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-lg font-bold text-gray-700 mr-2">
-                  {[
-                    '',   // No emotion
-                    '😐', // Neutral
-                    '😀', // Joy
-                    '😭', // Sadness
-                    '😡', // Anger
-                  ][diaries[idx].emotion]}
-                </span>
-                <button
-                  className="inline-block bg-red-200 rounded-full px-3 py-1 text-lg font-bold text-gray-700 mr-2"
-                  onClick={() => openModal(diaries[idx].id)}
-                >
-                  🗑
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div key={idx} className="rounded overflow-hidden shadow-lg flex items-center justify-center text-xl min-h-[24rem]">📝</div>
-          )
-        ))}
-      </div>
+
     </div>
   );
 
