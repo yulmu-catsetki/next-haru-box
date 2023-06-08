@@ -98,8 +98,8 @@ const MainPage = () => {
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      <h1>Main Page</h1>
-      <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }}>
+      
+      <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
         <CameraControls diaries={diaries}  onCameraUpdate={handleCameraUpdate} handleDashboardClick={handleDashboardClick}>
         </CameraControls>
       </Canvas>

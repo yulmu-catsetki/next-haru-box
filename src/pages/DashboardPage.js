@@ -45,7 +45,7 @@ const DashboardPage = () => {
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
     
         <Canvas orthographic camera={{ zoom: 100, position: [0.04834, 0.30533, -0.73559] }}>
-          <CameraControls onCameraUpdate={handleCameraUpdate} />
+          <CameraControls diaries={diaries}  onCameraUpdate={handleCameraUpdate}/>
         </Canvas>
       
     </div>

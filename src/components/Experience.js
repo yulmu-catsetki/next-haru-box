@@ -29,7 +29,7 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
         shadow-radius={1.3} // Adjust shadow radius as needed
       />
       <OrbitControls enableZoom={true} />
-      <ScrollControls damping={0.5}>
+      <ScrollControls damping={1} style={{ overflow: 'hidden' }}>
         <Outside diaries={diaries} castShadow receiveShadow />
         <Diary/>
         <DiaryObjects diaries={diaries} castShadow receiveShadow />
