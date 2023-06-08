@@ -5,21 +5,18 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useGLTF } from '@react-three/drei';
 import styles from './Room.module.css';
 
-export function Room({ handleDashboardClick }) {
-  const { nodes, materials } = useGLTF('/models/final.glb');
-  const isDashboardPage = usePathname() === '/DashboardPage';
-  const ref = useRef(null);
-  const tl = useRef(null);
-
-
+export function Diary() {
+  const { nodes, materials, animations } = useGLTF('/models/diary.glb');
   const router = useRouter();
+  const ref = useRef(null);
+
+  const handleDiaryClick = () => {
+    router.push('/DiaryPage') ; // Replace '/DiaryPage' with the actual path of your DiaryPage component
+  };
 
   
-
-  useFrame(() => {});
-
   return (
-    <group dispose={null} ref={ref}>
+    <group dispose={null} ref={ref} onClick={handleDiaryClick} >
       {Object.entries(nodes).map(([name, node], index) => (
         <mesh
           key={index}
@@ -28,12 +25,11 @@ export function Room({ handleDashboardClick }) {
           position={node.position}
           rotation={node.rotation}
           scale={node.scale}
-          onClick={name === 'dashboard' ? handleDashboardClick : undefined}
+   
         />
       ))}
-      
     </group>
   );
 }
 
-useGLTF.preload('/models/room.glb');
+useGLTF.preload('/models/Diary.glb');

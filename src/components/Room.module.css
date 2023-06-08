@@ -1,14 +1,4 @@
-.room-container {
-    cursor: default;
-  }
-  
-  .hoverable-mesh {
-    cursor: pointer;
-  }
-  .roomContainer {
-    /* Other styles for the container */
-  
-    &.blur {
-      filter: blur(5px); /* Apply the desired blur effect */
-    }
+
+  .diaryHovered {
+    cursor: pointer; /* Change the cursor when diary is hovered */
   }

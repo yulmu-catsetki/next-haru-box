@@ -3,6 +3,7 @@ import { OrbitControls, ScrollControls } from "@react-three/drei";
 import { Room } from "./room.js";
 import { DiaryObjects } from './DiaryObjects.js';
 import { Outside } from './outside.js';
+import {Diary } from './Diary.js';
 import * as THREE from 'three';
 import { useShadow } from '@react-three/drei';
 
@@ -30,6 +31,7 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
       <OrbitControls enableZoom={true} />
       <ScrollControls damping={0.5}>
         <Outside diaries={diaries} castShadow receiveShadow />
+        <Diary/>
         <DiaryObjects diaries={diaries} castShadow receiveShadow />
         <Room handleDashboardClick={handleDashboardClick} receiveShadow />
       </ScrollControls>
