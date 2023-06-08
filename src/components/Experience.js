@@ -3,18 +3,17 @@ import { OrbitControls, ScrollControls } from "@react-three/drei";
 import { Room } from "./room.js";
 import { DiaryObjects } from './DiaryObjects.js';
 import { Outside } from './outside.js';
-import { Text } from '@react-three/drei';
 import { Diary } from './Diary.js';
-import * as THREE from 'three';
-import { useShadow } from '@react-three/drei';
+import { Text,  } from '@react-three/drei';
+
 
 export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) {
   const [currentDateTime, setCurrentDateTime] = useState('');
-
+  
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
-      const formattedDateTime = now.toLocaleString('ko-KR');
+      const formattedDateTime = now.toLocaleString('en-US');
       setCurrentDateTime(formattedDateTime);
     };
 
@@ -29,8 +28,9 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
     <group scale={[1, 1, 1]}>
       <group position={[-0.7, 1.5, -0.7]} rotation={[0, Math.PI / 4, 0]}>
         <Text
-          fontSize={0.2} // Adjust the font size of the text
-          color="white" // Adjust the color of the text
+
+          fontSize={0.2}
+          color="white"
         >
           {currentDateTime}
         </Text>
@@ -51,13 +51,13 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
         shadow-bias={-0.001} // Adjust shadow bias as needed
         shadow-radius={1.3} // Adjust shadow radius as needed
       />
-      <OrbitControls enableZoom={true} />
-      <ScrollControls damping={1} style={{ overflow: 'hidden' }}>
+      <OrbitControls enabled={true} maxAzimuthAngle={[-Math.PI,Math.PI]} enableDamping={true} enableZoom={true} minZoom={100} maxZoom={1000} />
+      
         <Outside diaries={diaries} castShadow receiveShadow />
         <Diary />
         <DiaryObjects diaries={diaries} castShadow receiveShadow />
         <Room handleDashboardClick={handleDashboardClick} receiveShadow />
-      </ScrollControls>
+
     </group>
       
     </group>
