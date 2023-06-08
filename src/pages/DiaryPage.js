@@ -66,9 +66,11 @@ const DiaryPage = () => {
       const snapshot = await uploadBytesResumable(storageRef, blob);
 
       // 파일에 대한 다운로드 URL 가져오기
-      const url = await getDownloadURL(snapshot.ref);
+      let url = await getDownloadURL(snapshot.ref);
 
       // 이미지 URL이 포함된 일기 객체 생성
+      if (imgUrl && !imgB64) { url = imgUrl }
+
       const diary = { content, emotion, date: serverTimestamp(), imgUrl: url };
 
       console.log('저장된 imgB64: ' + imgB64);
@@ -154,6 +156,7 @@ const DiaryPage = () => {
       setImgUrl(url);
     }
   };
+
   const handleGenerateImage_OPENAI = async (event) => {
 
     if (content.trim() === '') {
