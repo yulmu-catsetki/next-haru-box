@@ -33,7 +33,6 @@ const MainPage = () => {
   }, [session?.user?.id, router]);
   const handleDiaryClick = () => {
     console.log("Diary object clicked");
-    router.push("/DiaryPage");
   };
 
   const [diaries, setDiaries] = useState([]);

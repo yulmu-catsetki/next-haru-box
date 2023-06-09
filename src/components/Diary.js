@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { Html } from '@react-three/drei';
-
-export function Diary() {
+import { useRouter } from 'next/navigation';
+export function Diary({diaries}) {
   const { nodes } = useGLTF('/models/diary.glb');
   const [hovered, setHovered] = useState(false);
   const ref = useRef();
