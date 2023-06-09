@@ -54,7 +54,7 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
       <OrbitControls enabled={true} maxAzimuthAngle={[-Math.PI,Math.PI]} enableDamping={true} enableZoom={true} minZoom={100} maxZoom={1000} />
       
         <Outside diaries={diaries} castShadow receiveShadow />
-        <Diary />
+        <Diary diaries={diaries} />
         <DiaryObjects diaries={diaries} castShadow receiveShadow />
         <Room handleDashboardClick={handleDashboardClick} receiveShadow />
 

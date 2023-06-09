@@ -73,7 +73,6 @@ const DiaryPage = () => {
 
       const diary = { content, emotion, date: serverTimestamp(), imgUrl: url };
 
-      console.log('저장된 imgB64: ' + imgB64);
       // 일기를 Firestore에 저장
       await addDoc(userDiariesCollection, diary);
 
