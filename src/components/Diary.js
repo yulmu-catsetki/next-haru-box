@@ -16,7 +16,7 @@ export function Diary({ handleDiaryClick }) {
   };
 
 
-  const textPosition = [-0.3, 0, 0]; // Adjust the position of the text
+  const textPosition = [0.084956, 0.00046,0.24007]; // Adjust the position of the text
 
   return (
     <group ref={ref} onClick={handleDiaryClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
