@@ -174,7 +174,7 @@ return (
     </div>
 
     {/* 일기 그리드 */}
-    <div className={`grid grid-cols-${COLUMN_NUM} gap-4 px-20`}>
+    <div className={`grid grid-cols-5 gap-4 px-20`}>
       {paginatedDiaries &&
         Array(itemsPerPage).fill(null).map((_, idx) => {
           const diary = paginatedDiaries[idx];
