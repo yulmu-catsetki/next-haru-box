@@ -1,8 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import gsap from 'gsap';
 import { usePathname, useRouter } from 'next/navigation';
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useVideoTexture } from '@react-three/drei';
 import styles from './Room.module.css';
 
 export function Room({ handleDashboardClick }) {
@@ -11,27 +10,43 @@ export function Room({ handleDashboardClick }) {
   const ref = useRef(null);
   const tl = useRef(null);
 
-
   const router = useRouter();
-
-  
 
   useFrame(() => {});
 
+  // Load video texture
+  const videoTexture = useVideoTexture('/video/screen.mp4');
+  videoTexture.flipY = false; 
+
   return (
     <group dispose={null} ref={ref}>
-      {Object.entries(nodes).map(([name, node], index) => (
-        <mesh
-          key={index}
-          geometry={node.geometry}
-          material={node.material}
-          position={node.position}
-          rotation={node.rotation}
-          scale={node.scale}
-          onClick={name === 'dashboard' ? handleDashboardClick : undefined}
-        />
-      ))}
-      
+      {Object.entries(nodes).map(([name, node], index) => {
+        if (name === 'screen') {
+          return (
+            <mesh
+              key={index}
+              geometry={node.geometry}
+              material={materials[name]}
+              position={node.position}
+              rotation={node.rotation}
+              scale={node.scale}
+            >
+              <meshBasicMaterial attach="material" map={videoTexture} />
+            </mesh>
+          );
+        }
+        return (
+          <mesh
+            key={index}
+            geometry={node.geometry}
+            material={node.material}
+            position={node.position}
+            rotation={node.rotation}
+            scale={node.scale}
+            onClick={name === 'dashboard' ? handleDashboardClick : undefined}
+          />
+        );
+      })}
     </group>
   );
 }

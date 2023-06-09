@@ -21,7 +21,7 @@ const MainPage = () => {
   const handleDashboardClick = () => {
     console.log('Dashboard clicked');
     setDashboardClicked(true);
-
+    router.push("/DashboardPage");
     
   };
 
