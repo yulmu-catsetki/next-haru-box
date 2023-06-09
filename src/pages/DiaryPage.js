@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
-
+import './book-layout.css';
 const DiaryPage = () => {
 
   const router = useRouter();
@@ -295,7 +295,11 @@ const DiaryPage = () => {
     checkAndResetGenerateTimes();
   }, []);
 
+  
+
   return (
+
+    
 
     <div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
       {isLoading && (
@@ -305,9 +309,7 @@ const DiaryPage = () => {
           </div>
         </div>
       )}
-
-
-      <div className="flex self-start items-center mb-4">
+       <div className="flex self-start items-center mb-4">
         <button
           onClick={() => router.push('/MainPage')}
           className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
@@ -334,87 +336,119 @@ const DiaryPage = () => {
         </div>
       </div>
 
-      <div className="flex flex-grow items-center justify-center">
-        <div className="w-2/5 flex flex-col items-center justify-center pr-4">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">{date}</h1> {/* 날짜 표시 수정 */}
+       <div className="scene">
+      <div className="book-wrap">
+        <div className="left-side">
+          <div className="book-cover-left"></div>
+          <div className="layer1">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer2">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer3">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer4">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer-text">
+            <div className="page-left-2">
+              <div className="corner"></div>
+              <div className="corner2"></div>
+              <div className="corner-fold"></div>
+              <div className="page-text w-richtext">
+                {/* Placeholder for DiaryPage content */}
+                <h3 className="text-3xl font-bold text-gray-800 mb-6">{date}</h3> {/* 날짜 표시 수정 */}
 
-          <div className="relative w-1/2">
-            <textarea
-              value={content}
-              onChange={handleContentChange}
-              maxLength={MAX_CONTENT_LENGTH}
-              placeholder="일기를 작성하세요..."
-              className="w-full h-96 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
-            />
-            <div className="absolute right-3 bottom-3 text-xs text-gray-400">
-              {`${content.length}/${MAX_CONTENT_LENGTH}`}
+                  <textarea
+                    value={content}
+                    onChange={handleContentChange}
+                    maxLength={MAX_CONTENT_LENGTH}
+                    placeholder="일기를 작성하세요..."
+                    className="w-full h-40 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
+                  />
+                  <div className=" right-3 bottom-3 text-xs text-gray-400">
+                    {`${content.length}/${MAX_CONTENT_LENGTH}`}
+                  </div>
+          
+                <p>‍</p>
+                <div className="flex justify-center mb-6">
+                    {[
+                      '😐', // Neutral
+                      '😀', // Joy
+                      '😭', // Sadness
+                      '😡', // Anger
+                    ].map((val, index) => (
+                      <button
+                        key={index + 1}
+                        onClick={() => handleEmotionChange(index + 1)}
+                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
+                          }`}
+                      >
+                        {val}
+                      </button>
+                    ))}
+                </div>
+                      <button
+                  onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
+                  className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
+                >
+                  그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
+                </button>
+                
+              </div>
             </div>
           </div>
-
-          <div className="flex justify-center mb-6">
-            {[
-              '😐', // Neutral
-              '😀', // Joy
-              '😭', // Sadness
-              '😡', // Anger
-            ].map((val, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handleEmotionChange(index + 1)}
-                className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
-                  }`}
-              >
-                {val}
-              </button>
-            ))}
+        </div>
+        <div className="center"></div>
+        <div className="right-side">
+          <div className="book-cover-right"></div>
+          <div className="layer1">
+            <div className="page-right"></div>
           </div>
-
-
-          <button
-            onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
-            className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
-          >
-            그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
-          </button>
-          <button
-            onClick={() => { setGenerateTimes(MAX_GENERATE_TIMES); localStorage.setItem('generateTimes', MAX_GENERATE_TIMES) }}
-            className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
-          >
-            생성 횟수 회복 (개발자용)
-          </button>
-          <div className="flex">
-            <input
-              type="checkbox"
-              className="mr-2 cursor-pointer"
-              checked={dummyMode}
-              onChange={handleDummyModeChange}
-            />
-            <p className="text-lg font-bold text-gray-800">더미 사진 생성</p>
+          <div className="layer2 right">
+            <div className="page-right"></div>
           </div>
+          <div className="layer3 right">
+            <div className="page-right"></div>
+          </div>
+          <div className="layer4 right">
+            <div className="page-right"></div>
+          </div>
+          <div className="layer-text right">
+            <div className="page-right-2">
+              <div className="page-text w-richtext">
+                {/* Placeholder for DiaryPage content */}
+                <div className="bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg aspect-ratio-container" 
+                    style={{ paddingTop: '66.6667%' }}>
+                      {imgUrl ? <img src={imgUrl} alt="Generated Art" className="object-contain h-full" /> : <div className="justify-center items-center"><p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p></div>}</div>
+
+
+                <button
+                  onClick={handleSaveDiary}
+                  className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
+                >
+                  일기 저장
+                </button>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+     
+
+      <div className="flex flex-grow items-center justify-center">
+        <div className="w-2/5 flex flex-col items-center justify-center pr-4">
+        
 
         </div>
         <div className="w-3/5 h-1/2 flex flex-col items-center justify-center pr-5">
 
-          <div className="overflow-auto bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg h-[600px] w-[800px]">
-            {imgUrl ? (
-              <img
-                src={imgUrl}
-                alt="Generated Art"
-                className="object-contain max-h-full max-w-full"
-              />
-            ) : (
-              <div className="justify-center items-center" >
-                <p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p>
-              </div>
-            )}
-          </div>
-
-          <button
-            onClick={handleSaveDiary}
-            className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
-          >
-            일기 저장
-          </button>
+          
         </div>
       </div>
     </div>
