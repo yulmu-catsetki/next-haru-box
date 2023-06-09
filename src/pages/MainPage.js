@@ -10,7 +10,6 @@ import { useSession } from 'next-auth/react';
 
 
 
-
 const MainPage = () => {
   const router = useRouter();
 
@@ -32,45 +31,9 @@ const MainPage = () => {
       //router.push('/auth/signin');
     }
   }, [session?.user?.id, router]);
-
-  const handleCameraUpdate = (camera) => {
-    /*if (dashboardClicked) {
-      const targetPosition = new THREE.Vector3(0.04834, 0.30533, -0.73559);
-      const startPosition = camera.position.clone();
-  
-      const targetRotation = new THREE.Vector3(0, 2.25, 0);
-      const startRotation = camera.rotation.clone();
-  
-      const zoomDuration = 1; // Duration of zoom animation in seconds
-      const zoomFrames = 30 * zoomDuration; // Total frames for the animation
-  
-      const step = (currentFrame) => {
-        const t = currentFrame / zoomFrames;
-        const newPosition = new THREE.Vector3().lerpVectors(startPosition, targetPosition, t);
-        camera.position.set(newPosition.x, newPosition.y, newPosition.z);
-  
-        const newRotation = startRotation.y+(targetRotation.y-startRotation.y)*t;
-        camera.rotation.y=newRotation;
-  
-        if (currentFrame < zoomFrames) {
-          requestAnimationFrame(() => step(currentFrame + 1));
-        } else {
-          // Animation complete, update camera position and rotation
-          setCameraPosition([0.04834, 0.30533, -0.73559]);
-          camera.rotation.y = 2.25;
-          //router.push('/DashboardPage');
-        }
-      };
-  
-      step(0);
-    }
-    camera.zoom=2000; */
-    
-    
-    // Manipulate the camera as desired
-    //camera.rotation.x += 0.01;
-    
-    // camera.rotation.z += 0.01;
+  const handleDiaryClick = () => {
+    console.log("Diary object clicked");
+    router.push("/DiaryPage");
   };
 
   const [diaries, setDiaries] = useState([]);
@@ -100,9 +63,9 @@ const MainPage = () => {
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
       
       <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
-        <CameraControls diaries={diaries}  onCameraUpdate={handleCameraUpdate} handleDashboardClick={handleDashboardClick}>
-        </CameraControls>
+        <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
       </Canvas>
+
     </div>
   );
 };

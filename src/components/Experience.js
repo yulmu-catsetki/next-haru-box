@@ -26,7 +26,7 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
 
   return (
     <group scale={[1, 1, 1]}>
-      <group position={[-0.7, 1.5, -0.7]} rotation={[0, Math.PI / 4, 0]}>
+      <group position={[0, 1.5, -1.2]} rotation={[0, 0, 0]}>
         <Text
 
           fontSize={0.2}
@@ -54,7 +54,7 @@ export function Experience({ diaries, handleDiaryClick, handleDashboardClick }) 
       <OrbitControls enabled={true} maxAzimuthAngle={[-Math.PI,Math.PI]} enableDamping={true} enableZoom={true} minZoom={100} maxZoom={1000} />
       
         <Outside diaries={diaries} castShadow receiveShadow />
-        <Diary />
+        <Diary handleDiaryClick ={handleDiaryClick} />
         <DiaryObjects diaries={diaries} castShadow receiveShadow />
         <Room handleDashboardClick={handleDashboardClick} receiveShadow />
 

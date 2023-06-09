@@ -1,22 +1,25 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
-import gsap from 'gsap';
-import { usePathname, useRouter } from 'next/navigation';
+import React, { useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import styles from './Room.module.css';
+import { Html } from '@react-three/drei';
 
-export function Diary() {
-  const { nodes, materials, animations } = useGLTF('/models/diary.glb');
-  const router = useRouter();
-  const ref = useRef(null);
+export function Diary({ handleDiaryClick }) {
+  const { nodes } = useGLTF('/models/diary.glb');
+  const [hovered, setHovered] = useState(false);
+  const ref = useRef();
 
-  const handleDiaryClick = () => {
-    router.push('/DiaryPage') ; // Replace '/DiaryPage' with the actual path of your DiaryPage component
+  const handlePointerOver = () => {
+    setHovered(true);
   };
 
-  
+  const handlePointerOut = () => {
+    setHovered(false);
+  };
+
+
+  const textPosition = [-0.3, 0, 0]; // Adjust the position of the text
+
   return (
-    <group dispose={null} ref={ref} onClick={handleDiaryClick} >
+    <group ref={ref} onClick={handleDiaryClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut}>
       {Object.entries(nodes).map(([name, node], index) => (
         <mesh
           key={index}
@@ -25,11 +28,28 @@ export function Diary() {
           position={node.position}
           rotation={node.rotation}
           scale={node.scale}
-   
         />
       ))}
+      {hovered && (
+        <Html position={textPosition}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '150px',
+              height: '25px',
+              background: 'white',
+              color: '#6096B4',
+              font: 'Roboto',
+            }}
+          >
+            Go to Diary Page
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
 
-useGLTF.preload('/models/Diary.glb');
+useGLTF.preload('/models/diary.glb');
