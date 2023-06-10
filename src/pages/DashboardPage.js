@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import DashboardPageEach from '../components/DashboardPageEach';
+import Layout from '../components/Layout';
 
 const DashboardPage = () => {
 
@@ -115,7 +116,7 @@ const DashboardPage = () => {
 
 
 return (
-  <div className="p-4">
+  <Layout><div className="p-4">
     <div className="flex self-start items-center mb-4">
       <button
         onClick={() => router.push('/MainPage')}
@@ -269,7 +270,7 @@ return (
     {isDiaryModalOpen && (
       <DashboardPageEach diary={selectedDiary} onClose={handleCloseDiary} onDelete={openDeleteModal} />
     )}
-  </div>
+  </div></Layout>
 );
 
 

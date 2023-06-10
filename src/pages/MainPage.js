@@ -6,9 +6,7 @@ import { db } from '../firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import * as THREE from 'three';
 import { useSession } from 'next-auth/react';
-
-
-
+import Layout from '../components/Layout';
 
 const MainPage = () => {
   const router = useRouter();
@@ -21,7 +19,7 @@ const MainPage = () => {
     console.log('Dashboard clicked');
     setDashboardClicked(true);
     router.push("/DashboardPage");
-    
+
   };
   const handleDiaryClick = () => {
 
@@ -73,24 +71,24 @@ const MainPage = () => {
       //router.push('/auth/signin');
     }
   }, [session?.user?.id, router]);
- 
+
   const [diaries, setDiaries] = useState([]);
   const getDiaries = async () => {
     if (!session || !session.user || !session.user.id) {
       // Handle the case when session or session.user or session.user.id is undefined
       return;
     }
-  
+
     const diaryCollection = collection(db, 'users', session.user.id, 'diaries');
     const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
-  
+
     const fetchedDiaries = result.docs.map((doc) => {
       return { id: doc.id, ...doc.data() };
     });
     setDiaries(fetchedDiaries);
   };
-  
+
   useEffect(() => {
     if (session) {
       getDiaries();
@@ -98,13 +96,13 @@ const MainPage = () => {
   }, [session]);
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      
-      <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
-        <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
-      </Canvas>
-
-    </div>
+    <Layout delay={0.8}>
+      <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+        <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
+          <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
+        </Canvas>
+      </div>
+    </Layout>
   );
 };
 

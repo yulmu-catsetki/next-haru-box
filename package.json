@@ -20,6 +20,7 @@
     "eslint-config-next": "13.4.4",
     "firebase": "^9.22.1",
     "form-data": "^4.0.0",
+    "framer-motion": "^10.12.16",
     "fs": "^0.0.1-security",
     "gsap": "^3.11.5",
     "leva": "^0.9.34",

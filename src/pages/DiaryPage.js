@@ -6,6 +6,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Layout from '../components/Layout';
 
 import './book-layout.css';
 const DiaryPage = () => {
@@ -301,7 +302,7 @@ const DiaryPage = () => {
 
     
 
-    <div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
+    <Layout><div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
       {isLoading && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10 }}>
           <div className="loader">
@@ -451,7 +452,7 @@ const DiaryPage = () => {
           
         </div>
       </div>
-    </div>
+    </div></Layout>
   );
 
 };
