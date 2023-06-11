@@ -2,6 +2,7 @@ import "../styles/globals.css";
 import { SessionProvider } from "next-auth/react";
 import { AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { AudioProvider } from '../contexts/AudioContext';
 
 export default function App({ Component, pageProps }) {
   const { session, ...restPageProps } = pageProps;
@@ -9,9 +10,11 @@ export default function App({ Component, pageProps }) {
 
   return (
     <SessionProvider session={session}>
-      <AnimatePresence mode="wait" initial={false}>
-        <Component {...restPageProps} key={router.asPath} />
-      </AnimatePresence>
+      <AudioProvider>
+        <AnimatePresence mode="wait" initial={false}>
+          <Component {...restPageProps} key={router.asPath} />
+        </AnimatePresence>
+      </AudioProvider>
     </SessionProvider>
   );
 }

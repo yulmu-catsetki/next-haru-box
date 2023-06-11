@@ -10,6 +10,7 @@ import {
   notFound,
 } from 'next/navigation';
 import { useSession } from "next-auth/react";
+import { useAudio } from '../contexts/AudioContext';
 
 export default function StartPage() {
   const router = useRouter();
@@ -21,7 +22,10 @@ export default function StartPage() {
     }
   }, [session, router]);
 
+  const { initPlayer } = useAudio();
+
   const handleMoveToMainPage = () => {
+    initPlayer();
     router.push('/MainPage'); 
   };
   return (
