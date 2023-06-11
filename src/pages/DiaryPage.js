@@ -6,9 +6,10 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Layout from '../components/Layout';
+import { useAudio } from '../contexts/AudioContext';
 
 import './book-layout.css';
-import Layout from '../components/Layout';
 const DiaryPage = () => {
 
   const router = useRouter();
@@ -21,7 +22,7 @@ const DiaryPage = () => {
 
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
   const [content, setContent] = useState('');
-  const [emotion, setEmotion] = useState(1);
+  const [emotion, setEmotion] = useState(0);
 
   const [imgUrl, setImgUrl] = useState(''); // 임시 URL. 화면 표시용
   const [imgB64, setImgB64] = useState(''); // base64문자열. 사진 저장용
@@ -80,6 +81,11 @@ const DiaryPage = () => {
 
       console.log('Diary successfully written!');
       alert('일기가 정상적으로 저장되었습니다.');
+
+      router.push('/MainPage');
+      // changeEmotion(emotion);
+
+
     } catch (e) {
       console.error('Error writing document: ', e);
     } finally {
@@ -87,7 +93,7 @@ const DiaryPage = () => {
     }
 
     setContent('');
-    setEmotion(1);
+    setEmotion(0);
     setImgUrl('');
     setImgB64('');
   };
@@ -127,6 +133,7 @@ const DiaryPage = () => {
       setGenerateTimes(MAX_GENERATE_TIMES);
     }
   };
+
 
   const handleGenerateImage_Dummy = () => {
 
@@ -295,50 +302,71 @@ const DiaryPage = () => {
     checkAndResetGenerateTimes();
   }, []);
 
-  const backIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-  </svg>
-  );
+  // BGM, 날씨 관련
+
+  const { changeEmotion } = useAudio();
+
   return (
+
     <Layout><div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
-      <div className="scene" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-
-        {/* 뒤로 가기 버튼*/}
-        <div className="flex self-start items-center mb-4" style={{ zIndex: 10, position: 'absolute', top: '10px', left: '10px' }}>
-          <button
-            onClick={() => router.push('/MainPage')}
-            className="flex items-center space-x-2 px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
-          >
-            <div>{backIcon}</div>
-            <div>메인으로 돌아가기</div>
-          </button>
-
+      {isLoading && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10 }}>
+          <div className="loader">
+            <div className="spinner"></div>
+          </div>
         </div>
+      )}
+       <div className="flex self-start items-center mb-4">
+        <button
+          onClick={() => router.push('/MainPage')}
+          className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
+        >
+          ←
+        </button>
+        <div className="flex items-center bg-gray-200 p-2 rounded ml-2">
+          {session ? (
+            <>
+              <img
+                src={session.user.image}
+                alt="Profile Picture"
+                className="rounded-full h-8 w-8 mr-2"
+              />
+              <p className="text-xs font-bold text-gray-800">
+                Logged in as {session?.user?.name}
+              </p>
+            </>
+          ) : (
+            <p className="text-xs font-bold text-gray-800">
+              Not logged in
+            </p>
+          )}
+        </div>
+      </div>
 
-        {/* 책 오브젝트 */}
-        <div className="book-wrap">
-          <div className="left-side">
-            <div className="book-cover-left"></div>
-            <div className="layer1">
-              <div className="page-left"></div>
-            </div>
-            <div className="layer2">
-              <div className="page-left"></div>
-            </div>
-            <div className="layer3">
-              <div className="page-left"></div>
-            </div>
-            <div className="layer4">
-              <div className="page-left"></div>
-            </div>
-            <div className="layer-text">
-              <div className="page-left-2">
-                <div className="corner"></div>
-                <div className="corner2"></div>
-                <div className="corner-fold"></div>
-                <div className="page-text w-richtext">
-                  {/* Placeholder for DiaryPage content */}
-                  <h3 className="text-3xl font-bold text-gray-800 mb-6">{date}</h3> {/* 날짜 표시 수정 */}
+       <div className="scene">
+      <div className="book-wrap">
+        <div className="left-side">
+          <div className="book-cover-left"></div>
+          <div className="layer1">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer2">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer3">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer4">
+            <div className="page-left"></div>
+          </div>
+          <div className="layer-text">
+            <div className="page-left-2">
+              <div className="corner"></div>
+              <div className="corner2"></div>
+              <div className="corner-fold"></div>
+              <div className="page-text w-richtext">
+                {/* Placeholder for DiaryPage content */}
+                <h3 className="text-3xl font-bold text-gray-800 mb-6">{date}</h3> {/* 날짜 표시 수정 */}
 
                   <textarea
                     value={content}
@@ -350,9 +378,9 @@ const DiaryPage = () => {
                   <div className=" right-3 bottom-3 text-xs text-gray-400">
                     {`${content.length}/${MAX_CONTENT_LENGTH}`}
                   </div>
-
-                  <p>‍</p>
-                  <div className="flex justify-center mb-6">
+          
+                <p>‍</p>
+                <div className="flex justify-center mb-6">
                     {[
                       '😐', // Neutral
                       '😀', // Joy
@@ -360,79 +388,78 @@ const DiaryPage = () => {
                       '😡', // Anger
                     ].map((val, index) => (
                       <button
-                        key={index + 1}
-                        onClick={() => handleEmotionChange(index + 1)}
-                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
+                        key={index}
+                        onClick={() => handleEmotionChange(index)}
+                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index ? 'bg-blue-500' : 'bg-white'
                           }`}
                       >
                         {val}
                       </button>
                     ))}
-                  </div>
-                  <button
-                    onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
-                    className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
-                  >
-                    그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
-                  </button>
-
                 </div>
+                      <button
+                  onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
+                  className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
+                >
+                  그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
+                </button>
+                
               </div>
             </div>
           </div>
-          <div className="center"></div>
-          <div className="right-side">
-            <div className="book-cover-right"></div>
-            <div className="layer1">
-              <div className="page-right"></div>
-            </div>
-            <div className="layer2 right">
-              <div className="page-right"></div>
-            </div>
-            <div className="layer3 right">
-              <div className="page-right"></div>
-            </div>
-            <div className="layer4 right">
-              <div className="page-right"></div>
-            </div>
-            <div className="layer-text right">
-              <div className="page-right-2">
-                <div className="page-text w-richtext">
-                  {/* Placeholder for DiaryPage content */}
-                  <div className="bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg aspect-ratio-container"
+        </div>
+        <div className="center"></div>
+        <div className="right-side">
+          <div className="book-cover-right"></div>
+          <div className="layer1">
+            <div className="page-right"></div>
+          </div>
+          <div className="layer2 right">
+            <div className="page-right"></div>
+          </div>
+          <div className="layer3 right">
+            <div className="page-right"></div>
+          </div>
+          <div className="layer4 right">
+            <div className="page-right"></div>
+          </div>
+          <div className="layer-text right">
+            <div className="page-right-2">
+              <div className="page-text w-richtext">
+                {/* Placeholder for DiaryPage content */}
+                <div className="bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg aspect-ratio-container" 
                     style={{ paddingTop: '66.6667%' }}>
-                    {imgUrl ? <img src={imgUrl} alt="Generated Art" className="object-contain h-full" /> : <div className="justify-center items-center"><p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p></div>}</div>
+                      {imgUrl ? <img src={imgUrl} alt="Generated Art" className="object-contain h-full" /> : <div className="justify-center items-center"><p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p></div>}</div>
 
 
-                  <button
-                    onClick={handleSaveDiary}
-                    className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
-                  >
-                    일기 저장
-                  </button>
-
-                </div>
+                <button
+                  onClick={handleSaveDiary}
+                  className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
+                >
+                  일기 저장
+                </button>
+                
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-
+     
 
       <div className="flex flex-grow items-center justify-center">
         <div className="w-2/5 flex flex-col items-center justify-center pr-4">
-
+        
 
         </div>
         <div className="w-3/5 h-1/2 flex flex-col items-center justify-center pr-5">
 
-
+          
         </div>
       </div>
     </div></Layout>
   );
-
 
 };
 
