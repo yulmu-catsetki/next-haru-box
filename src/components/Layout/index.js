@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
 import { useAudio } from '../../contexts/AudioContext';
 import { useState } from "react";
+import { IconLogout, IconLogin } from "@tabler/icons-react";
 
-const Layout = ({ children, delay = 0 }) => {
+const Layout = ({ isMain = false, router, session, onSignOut, children, delay = 0 }) => {
 
   const { BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, currentBGMName, toggleBGM, toggleBGS, setBGMVolume, setBGSVolume } = useAudio();
 
@@ -138,6 +139,27 @@ const Layout = ({ children, delay = 0 }) => {
           {isBGMPlaying ? pauseIcon : playIcon}
         </div>
       </div>
+
+      {isMain && session && (
+        <div className="fixed top-0 z-[5] w-screen grid grid-cols-[1fr_auto_1fr] items-center">
+          <button className="justify-self-start ml-6" onClick={() => onSignOut()}>
+            <IconLogout className="w-8 h-8 px-1.5 py-1.5 bg-[#BDCDD6] rounded-full hover:bg-[#C7D7E0] focus:outline-none focus:shadow-outline" />
+          </button>
+          <p className="font-['CustomFont'] text-[36px] font-bold text-white">
+            {session?.user?.name}님의 하루 상자
+          </p>
+        </div>
+      )}
+      {isMain && !session && (
+        <div className="fixed top-0 z-[5] w-screen flex justify-start items-center">
+          <button className="mt-3 ml-6" onClick={() => router.push('/auth/signin')}>
+            <IconLogin className="w-8 h-8 px-1.5 py-1.5 bg-[#BDCDD6] rounded-full hover:bg-[#C7D7E0] focus:outline-none focus:shadow-outline" />
+          </button>
+          <p className="ml-6 mt-1 font-['CustomFont'] text-[24px] font-bold text-gray-800">
+            로그인 하세요.
+          </p>
+        </div>
+      )}
 
       <motion.div
         initial={{ y : 50, opacity: 0 }}

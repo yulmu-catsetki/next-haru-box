@@ -6,7 +6,6 @@ import { db } from '../firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import * as THREE from 'three';
 import { useSession, signOut } from 'next-auth/react';
-import { IconLogout, IconLogin } from "@tabler/icons-react";
 import Layout from '../components/Layout';
 import { useAudio } from '../contexts/AudioContext';
 import '/public/font.css';
@@ -140,27 +139,14 @@ const MainPage = () => {
   };
 
   return (
-    <Layout delay={0.8}>
-      <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-        {session ? (
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center p-2 bg-[#6096B4]">  
-          <p className="col-start-2 mr-auto mb-4 font-['CustomFont'] text-[48px] font-bold text-gray-100">
-            {session?.user?.name}님의 하루 상자
-          </p>
-          <button className="justify-self-end mr-6" onClick={() => confirmSignOut()}>
-            <IconLogout className="w-10 h-10 px-2 py-2 bg-[#BDCDD6] rounded-full hover:bg-[#C7D7E0] focus:outline-none focus:shadow-outline" />
-          </button>
-        </div>
-        ) : (
-        <div className="flex justify-end items-center p-2 bg-[#6096B4]">          
-          <p className=" text-lg font-bold text-gray-800 mr-6">
-            Not logged in
-          </p>
-          <button className="mr-6 my-6" onClick={() => router.push('/auth/signin')}>
-            <IconLogin className="w-10 h-10 px-2 py-2 font-bold bg-[#BDCDD6] rounded-full hover:bg-[#C7D7E0] focus:outline-none focus:shadow-outline" />
-          </button>
-        </div>
-        )}
+    <Layout
+      isMain={true}
+      router={router}
+      session={session}
+      onSignOut={confirmSignOut}
+      delay={0.8}
+    >
+      <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>        
         <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
           <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
         </Canvas>
