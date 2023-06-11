@@ -14,13 +14,16 @@ export const AudioProvider = ({ children }) => {
     const [isBGMPlaying, setIsBGMPlaying] = useState(false);
     const [isBGSPlaying, setIsBGSPlaying] = useState(false);
 
+    const [currentBGMName, setCurrentBGMName] = useState('');
+    const [currentEmotion, setCurrentEmotion] = useState(-1);
+
     // 노래 목록을 정의합니다.
 
     const BGMList = [
-        '/audio/bgm/00_Hedgehog.mp3',
-        '/audio/bgm/01_Sanctuary.mp3',
-        '/audio/bgm/02_Compromise.mp3',
-        '/audio/bgm/03_Bridge.mp3',
+        '/audio/bgm/00.Hedgehog.mp3',
+        '/audio/bgm/01.Sanctuary.mp3',
+        '/audio/bgm/02.Compromise.mp3',
+        '/audio/bgm/03.Bridge.mp3',
     ];
 
     const BGSList = [
@@ -28,13 +31,6 @@ export const AudioProvider = ({ children }) => {
         '/audio/bgs/01_sunny.mp3',
         '/audio/bgs/02_rain.mp3',
         '/audio/bgs/03_thunderstorm.mp3',
-    ];
-
-    const short = [
-        '/audio/short/00.mp3',
-        '/audio/short/01.mp3',
-        '/audio/short/02.mp3',
-        '/audio/short/03.mp3',
     ];
 
     const toggleBGM = () => { isBGMPlaying ? pauseBGM() : playBGM(); };
@@ -51,14 +47,23 @@ export const AudioProvider = ({ children }) => {
     }
 
     const playBGM = () => {
-        BGMRef.current.play();
-        setIsBGMPlaying(true);
-    }
+        try {
+            BGMRef.current.play();
+            setIsBGMPlaying(true);
+        } catch {
+            setIsBGMPlaying(false);
+        }
+    };
+
 
     const playBGS = () => {
-        BGSRef.current.play();
-        setIsBGSPlaying(true);
-    }
+        try {
+            BGSRef.current.play();
+            setIsBGSPlaying(true);
+        } catch {
+            setIsBGSPlaying(false);
+        }
+    };
 
     const setBGMVolume = (volume) => {
         if (volume >= 0 && volume <= 1) {
@@ -76,24 +81,20 @@ export const AudioProvider = ({ children }) => {
         }
     };
 
-    const changeBGM = (idx) => {
-        if (idx >= 0 && idx < BGMList.length) {
-            console.log('changeBGM: 0' + idx);
-            BGMRef.current.src = BGMList[idx];
-            if (isBGMPlaying) {
-                BGMRef.current.play();
-            }
-        }
-    };
+    const changeEmotion = (emotion) => {
+        if (emotion >= 0 && emotion < 4) {
 
-    const changeBGS = (idx) => {
-        if (idx >= 0 && idx < BGSList.length) {
-            BGSRef.current.src = BGSList[idx];
-            if (isBGSPlaying) {
-                BGSRef.current.play();
+            if(emotion != currentEmotion){// 감정 변화 있음
+                BGMRef.current.src = BGMList[emotion];
+                BGSRef.current.src = BGSList[emotion];
+                playBGM();
+                playBGS();
             }
+
+            setCurrentBGMName(BGMList[emotion].substring(BGMList[emotion].lastIndexOf('/') + 1, BGMList[emotion].lastIndexOf('.mp3')));
+            setCurrentEmotion(emotion);
         }
-    };
+    }
 
     // 자동재생 정책 관련
     const initPlayer = () => {
@@ -122,7 +123,7 @@ export const AudioProvider = ({ children }) => {
 
 
     return (
-        <AudioContext.Provider value={{ BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, toggleBGM, toggleBGS, changeBGM, changeBGS, pauseBGM, pauseBGS, playBGM, playBGS, setBGMVolume, setBGSVolume, initPlayer }}>
+        <AudioContext.Provider value={{ BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, currentBGMName, toggleBGM, toggleBGS, changeEmotion, pauseBGM, pauseBGS, playBGM, playBGS, setBGMVolume, setBGSVolume, initPlayer }}>
             <audio ref={BGMRef} src={BGMList[0]} loop />
             <audio ref={BGSRef} src={BGSList[0]} loop />
             {children}

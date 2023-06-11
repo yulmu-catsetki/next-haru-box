@@ -24,33 +24,7 @@ const MainPage = () => {
   };
   const handleDiaryClick = () => {
 
-    const getLastDiary = () => {
-      if (diaries.length === 0) {
-        return null;
-      }
-      return diaries[diaries.length - 1];
-    };
-
-    const lastDiary = getLastDiary();
-
-    const seconds = lastDiary.date.seconds;
-    const nanoseconds = lastDiary.date.nanoseconds;
-
-    const timestampInMilliseconds = (seconds * 1000) + (nanoseconds / 1000000);
-
-    const lastDiaryTime = new Date(timestampInMilliseconds);
-    const now = new Date();
-
-    console.log("lastDiaryTime: " + lastDiaryTime);
-    console.log("now: " + now);
-
-    const nowMonth = now.getMonth();
-    const nowDate = now.getDate();
-
-    const lastDiaryMonth = lastDiaryTime.getMonth();
-    const lastDiaryDate = lastDiaryTime.getDate();
-
-    if (nowMonth == lastDiaryMonth && nowDate == lastDiaryDate) { // 오늘 일기 이미 작성함
+    if (isLastDiaryToday()) { // 오늘 일기 이미 작성함
       alert("오늘 일기를 이미 작성하였습니다.");
     } else {
       router.push('/DiaryPage'); // Replace '/DiaryPage' with the actual path of your DiaryPage component
@@ -64,6 +38,35 @@ const MainPage = () => {
     return `${year}${month}${day}`;
   };
 
+  const getLastDiary = () => {
+    if (diaries.length === 0) {
+      return null;
+    }
+    return diaries[diaries.length - 1];
+  };
+
+  // 마지막 일기가 오늘 일기인지 확인
+  const isLastDiaryToday = () => {
+    const lastDiary = getLastDiary();
+    if (!lastDiary) {
+      return null;
+    }
+    const seconds = lastDiary.date.seconds;
+    const nanoseconds = lastDiary.date.nanoseconds;
+
+    const timestampInMilliseconds = (seconds * 1000) + (nanoseconds / 1000000);
+
+    const lastDiaryTime = new Date(timestampInMilliseconds);
+    const now = new Date();
+
+    const nowMonth = now.getMonth();
+    const nowDate = now.getDate();
+
+    const lastDiaryMonth = lastDiaryTime.getMonth();
+    const lastDiaryDate = lastDiaryTime.getDate();
+
+    return (nowMonth == lastDiaryMonth && nowDate == lastDiaryDate)
+  }
 
   const { data: session } = useSession();
 
@@ -79,7 +82,7 @@ const MainPage = () => {
       // Handle the case when session or session.user or session.user.id is undefined
       return;
     }
-
+    
     const diaryCollection = collection(db, 'users', session.user.id, 'diaries');
     const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
@@ -90,26 +93,42 @@ const MainPage = () => {
     setDiaries(fetchedDiaries);
   };
 
+
+
   useEffect(() => {
     if (session) {
       getDiaries();
-
     }
   }, [session]);
 
   // BGS/BGM 관련
-  const { BGMRef, BGSRef, toggleBGM, toggleBGS, playBGM, playBGS, isBGMPlaying, isBGSPlaying, changeBGM, changeBGS } = useAudio();
-
+  const { BGMRef, BGSRef, playBGM, playBGS, changeEmotion } = useAudio();
 
   useEffect(() => {
+    SetBGM();
     setTimeout(() => {
       BGMRef.current.muted = false;
       BGSRef.current.muted = false;
       playBGM();
       playBGS();
     }, 1000); // 1000 밀리초 (1초) 후에 muted를 false로 설정합니다.
-  }, []);
 
+  }, [diaries]);
+
+  const SetBGM = () => {
+    // BGM 설정
+    if(isLastDiaryToday() === null){
+      return;
+    }
+
+    if (isLastDiaryToday()) {
+      const lastDiary = getLastDiary();
+      const emotion = lastDiary?.emotion ? lastDiary.emotion : 0;
+      changeEmotion(emotion);
+    } else {
+      changeEmotion(0);
+    }
+  };
 
   return (
     <Layout delay={0.8}>

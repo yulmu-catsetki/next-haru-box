@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Layout from '../components/Layout';
+import { useAudio } from '../contexts/AudioContext';
 
 import './book-layout.css';
 const DiaryPage = () => {
@@ -21,7 +22,7 @@ const DiaryPage = () => {
 
   const [date, setDate] = useState(new Date().toLocaleDateString('ko-KR'));
   const [content, setContent] = useState('');
-  const [emotion, setEmotion] = useState(1);
+  const [emotion, setEmotion] = useState(0);
 
   const [imgUrl, setImgUrl] = useState(''); // 임시 URL. 화면 표시용
   const [imgB64, setImgB64] = useState(''); // base64문자열. 사진 저장용
@@ -80,6 +81,10 @@ const DiaryPage = () => {
 
       console.log('Diary successfully written!');
       alert('일기가 정상적으로 저장되었습니다.');
+
+      console.log('diary done! change emotion to: ' + emotion);
+      changeEmotion(emotion);
+
     } catch (e) {
       console.error('Error writing document: ', e);
     } finally {
@@ -296,11 +301,11 @@ const DiaryPage = () => {
     checkAndResetGenerateTimes();
   }, []);
 
-  
+  // BGM, 날씨 관련
+
+  const { changeEmotion } = useAudio();
 
   return (
-
-    
 
     <Layout><div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
       {isLoading && (

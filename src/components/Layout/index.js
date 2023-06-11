@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const Layout = ({ children, delay = 0 }) => {
 
-  const { BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, toggleBGM, toggleBGS, setBGMVolume, setBGSVolume } = useAudio();
+  const { BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, currentBGMName, toggleBGM, toggleBGS, setBGMVolume, setBGSVolume } = useAudio();
 
   const handleBGMVolumeChange = (event) => {
     setBGMVolume(event.target.value);
@@ -49,6 +49,12 @@ const Layout = ({ children, delay = 0 }) => {
   const configIcon = (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" className="w-7 h-7">
       <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+    </svg>
+  );
+
+  const musicIcon = (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
     </svg>
   );
 
@@ -126,10 +132,11 @@ const Layout = ({ children, delay = 0 }) => {
 
       <div className="fixed top-0 right-0 m-2 flex items-center text-white z-10">
         {/* 현재 재생 중인 BGM 제목 */}
-        <span className="mr-2 font-pointer">{'currentBGMTitle'}</span>
+        <div className="mr-2 font-pointer">{musicIcon}</div>
+        <span className="mr-2 font-pointer">{currentBGMName}</span>
 
         {/* BGM Controls */}
-        <div className="p-1 cursor-pointer" onClick={toggleBGM}>
+        <div className="p-1 cursor-pointer" onClick={() => { toggleBGM(); toggleBGS() }}>
           {isBGMPlaying ? pauseIcon : playIcon}
         </div>
       </div>
