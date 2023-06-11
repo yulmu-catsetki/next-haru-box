@@ -24,7 +24,10 @@ const DashboardPage = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [diaryToDelete, setDiaryToDelete] = useState(null);
-
+  const backIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+</svg>
+);
 
   const addDummyDiary = () => {
     const dummyDiary = {
@@ -120,32 +123,17 @@ const DashboardPage = () => {
 
 return (
   <Layout><div className="p-4">
-    <div className="flex self-start items-center mb-4">
-      <button
-        onClick={() => router.push('/MainPage')}
-        className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
-      >
-        ←
-      </button>
-      <div className="flex items-center bg-gray-200 p-2 rounded ml-2">
-        {session ? (
-          <>
-            <img
-              src={session.user.image}
-              alt="Profile Picture"
-              className="rounded-full h-8 w-8 mr-2"
-            />
-            <p className="text-xs font-bold text-gray-800">
-              Logged in as {session?.user?.name}
-            </p>
-          </>
-        ) : (
-          <p className="text-xs font-bold text-gray-800">
-            Not logged in
-          </p>
-        )}
-      </div>
-    </div>
+    {/* 뒤로 가기 버튼*/}
+    <div className="flex self-start items-center mb-4" style={{ zIndex: 10, position: 'absolute', top: '5px', left: '10px' }}>
+          <button
+            onClick={() => router.push('/MainPage')}
+            className="flex items-center space-x-2 px-4 py-2 font-bold text-white bg-transparent rounded-full focus:outline-none focus:shadow-outline"
+          >
+            <div>{backIcon}</div>
+            <div>메인으로 돌아가기</div>
+          </button>
+
+        </div>
 
 
     {/* 페이지네이션 컨트롤 */}
