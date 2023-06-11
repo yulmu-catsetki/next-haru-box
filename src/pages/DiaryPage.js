@@ -6,10 +6,11 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import Layout from '../components/Layout';
 import { useAudio } from '../contexts/AudioContext';
+import '../../public/font.css'
 
 import './book-layout.css';
+import Layout from '../components/Layout';
 const DiaryPage = () => {
 
   const router = useRouter();
@@ -83,9 +84,10 @@ const DiaryPage = () => {
       console.log('Diary successfully written!');
       alert('일기가 정상적으로 저장되었습니다.');
 
-      router.push('/MainPage');
-      // changeEmotion(emotion);
+      console.log('daa');
 
+      changeEmotion(emotion);
+      router.push('/MainPage');
 
     } catch (e) {
       console.error('Error writing document: ', e);
@@ -94,7 +96,7 @@ const DiaryPage = () => {
     }
 
     setContent('');
-    setEmotion(0);
+    setEmotion(1);
     setImgUrl('');
     setImgB64('');
   };
@@ -136,7 +138,6 @@ const DiaryPage = () => {
   };
   
   const { changeEmotion } = useAudio();
-
 
   const handleGenerateImage_Dummy = () => {
 
@@ -316,12 +317,25 @@ const DiaryPage = () => {
     checkAndResetGenerateTimes();
   }, []);
 
-  // BGM, 날씨 관련
+  const backIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+  </svg>
+  );
 
-  const { changeEmotion } = useAudio();
+  const imageIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+  </svg>
+  );
+
+  const getDayOfWeek = (dateString) => {
+    const days = ["(일)", "(월)", "(화)", "(수)", "(목)", "(금)", "(토)"];
+    const date = new Date(dateString);
+    return days[date.getDay()];
+  };
+
+  const displayDate = `${date} ${getDayOfWeek(date)}`; // 예: '2023-06-12 (월)'
 
   return (
-
     <Layout><div className={`flex min-h-screen flex-col bg-gray-100 p-4 ${isLoading ? 'relative' : ''}`}>
       {isLoading && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10 }}>
@@ -330,57 +344,44 @@ const DiaryPage = () => {
           </div>
         </div>
       )}
-       <div className="flex self-start items-center mb-4">
-        <button
-          onClick={() => router.push('/MainPage')}
-          className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
-        >
-          ←
-        </button>
-        <div className="flex items-center bg-gray-200 p-2 rounded ml-2">
-          {session ? (
-            <>
-              <img
-                src={session.user.image}
-                alt="Profile Picture"
-                className="rounded-full h-8 w-8 mr-2"
-              />
-              <p className="text-xs font-bold text-gray-800">
-                Logged in as {session?.user?.name}
-              </p>
-            </>
-          ) : (
-            <p className="text-xs font-bold text-gray-800">
-              Not logged in
-            </p>
-          )}
-        </div>
-      </div>
+      <div className="scene" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
 
-       <div className="scene">
-      <div className="book-wrap">
-        <div className="left-side">
-          <div className="book-cover-left"></div>
-          <div className="layer1">
-            <div className="page-left"></div>
-          </div>
-          <div className="layer2">
-            <div className="page-left"></div>
-          </div>
-          <div className="layer3">
-            <div className="page-left"></div>
-          </div>
-          <div className="layer4">
-            <div className="page-left"></div>
-          </div>
-          <div className="layer-text">
-            <div className="page-left-2">
-              <div className="corner"></div>
-              <div className="corner2"></div>
-              <div className="corner-fold"></div>
-              <div className="page-text w-richtext">
-                {/* Placeholder for DiaryPage content */}
-                <h3 className="text-3xl font-bold text-gray-800 mb-6">{date}</h3> {/* 날짜 표시 수정 */}
+        {/* 뒤로 가기 버튼*/}
+        <div className="flex self-start items-center mb-4" style={{ zIndex: 10, position: 'absolute', top: '5px', left: '10px' }}>
+          <button
+            onClick={() => router.push('/MainPage')}
+            className="flex items-center space-x-2 px-4 py-2 font-bold text-white bg-transparent rounded-full focus:outline-none focus:shadow-outline"
+          >
+            <div>{backIcon}</div>
+            <div>메인으로 돌아가기</div>
+          </button>
+
+        </div>
+
+        {/* 책 오브젝트 */}
+        <div className="book-wrap">
+          <div className="left-side">
+            <div className="book-cover-left"></div>
+            <div className="layer1">
+              <div className="page-left"></div>
+            </div>
+            <div className="layer2">
+              <div className="page-left"></div>
+            </div>
+            <div className="layer3">
+              <div className="page-left"></div>
+            </div>
+            <div className="layer4">
+              <div className="page-left"></div>
+            </div>
+            <div className="layer-text">
+              <div className="page-left-2">
+                <div className="corner"></div>
+                <div className="corner2"></div>
+                <div className="corner-fold"></div>
+                <div className="page-text w-richtext flex flex-col h-full">
+                  {/* Placeholder for DiaryPage content */}
+                  <h3 className="font-bold text-gray-800 mb-3" style={{ fontFamily: 'CustomFont, sans-serif', fontSize: 35 }}>{displayDate}</h3>
 
                   <textarea
                     value={content}
@@ -391,35 +392,39 @@ const DiaryPage = () => {
                     className="w-full h-3/5 flex-grow px-3 py-2 mb-0 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
                     style={{ flexBasis: '60%', fontFamily: 'CustomFont, sans-serif', fontSize: 25 }}
                   />
-                  <div className=" right-3 bottom-3 text-xs text-gray-400">
-                    {`${content.length}/${MAX_CONTENT_LENGTH}`}
-                  </div>
+                  <div className="flex flex-col w-full px-3 py-1">
+                    <div className="flex items-start">
+                      <div className="flex mr-auto">
+                        {[
+                          '😐', // Neutral
+                          '😀', // Joy
+                          '😭', // Sadness
+                          '😡', // Anger
+                        ].map((val, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleEmotionChange(index)}
+                            disabled={isDiaryFinished}
+                            className={`w-14 h-10 rounded-full border-2 border-gray-300 focus:outline-none mx-2 text-xl ${emotion === index ? 'bg-blue-500' : 'bg-white'
+                              }`}
+                          >
+                            {val}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="ml-auto text-xs text-gray-400">
+                        {`${content.length}/${MAX_CONTENT_LENGTH}`}
+                      </div>
+                    </div>
 
-                  <p>‍</p>
-                  <div className="flex justify-center mb-6">
-                    {[
-                      '😐', // Neutral
-                      '😀', // Joy
-                      '😭', // Sadness
-                      '😡', // Anger
-                    ].map((val, index) => (
-                      <button
-                        key={index + 1}
-                        onClick={() => handleEmotionChange(index + 1)}
-                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
-                          }`}
-                      >
-                        {val}
-                      </button>
-                    ))}
                   </div>
                   <button
-                    onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
-                    className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
-                  >
-                    그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
-                  </button>
+                    onClick={handleFinishDiary}
+                    disabled={isDiaryFinished}
+                    className={`w-full px-10 py-3 mt-4 font-bold rounded-full focus:outline-none focus:shadow-outline ${!isDiaryFinished ? 'text-white bg-blue-500 hover:bg-blue-400' : 'text-gray-500 bg-gray-300'}`}>
 
+                    일기 작성 완료
+                  </button>
                 </div>
               </div>
             </div>
@@ -441,41 +446,64 @@ const DiaryPage = () => {
             </div>
             <div className="layer-text right">
               <div className="page-right-2">
-                <div className="page-text w-richtext">
-                  {/* Placeholder for DiaryPage content */}
-                  <div className="bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg aspect-ratio-container"
-                    style={{ paddingTop: '66.6667%' }}>
-                    {imgUrl ? <img src={imgUrl} alt="Generated Art" className="object-contain h-full" /> : <div className="justify-center items-center"><p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p></div>}</div>
+                <div className="page-text w-richtext relative">
+
+                  {/* 그림 표시 */}
+                  <div className="w-full h-3/5 shadow-md flex-grow mt-20 mb-0 text-gray-700 border focus:outline-none focus:shadow-outline overflow-hidden">
+                    {imgUrl ? (
+                      <img src={imgUrl} alt="Generated Art" className="object-cover h-full w-full" />
+                    ) : (
+                      <img src={'https://via.placeholder.com/900x600/ffffff/&text='} alt="dummy Art" className="object-cover h-full w-full" />
+                    )}
+                  </div>
 
 
-                  <button
-                    onClick={handleSaveDiary}
-                    className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
-                  >
-                    일기 저장
-                  </button>
+                  {/* 다시 그리기 */}
+                  <div className="mt-3 mb-3">
+                    <button
+                      onClick={handleGenerateImage_Dream}
+                      disabled={!isDiaryFinished}
+                      className={`w-full px-10 py-2.5 mt-3 font-bold rounded-full focus:outline-none focus:shadow-outline ${isDiaryFinished ? 'text-white bg-blue-500 hover:bg-blue-400' : 'text-gray-500 bg-gray-300'}`}
+                    >
+                      다시 그리기 ({generateTimes}/{MAX_GENERATE_TIMES - 1})
+                    </button>
+                  </div>
+
+                  {/* 일기 저장 */}
+                  <div className="mb-3">
+                    <button
+                      onClick={handleSaveDiary}
+                      disabled={!isDiaryFinished}
+                      className={`w-full px-10 py-3 font-bold rounded-full focus:outline-none focus:shadow-outline ${isDiaryFinished ? 'text-white bg-green-500 hover:bg-green-400' : 'text-gray-500 bg-gray-300'}`}
+                    >
+                      일기 저장
+                    </button>
+                  </div>
 
                 </div>
+
+
               </div>
             </div>
           </div>
         </div>
       </div>
 
-     
+
 
       <div className="flex flex-grow items-center justify-center">
         <div className="w-2/5 flex flex-col items-center justify-center pr-4">
-        
+
 
         </div>
         <div className="w-3/5 h-1/2 flex flex-col items-center justify-center pr-5">
 
-          
+
         </div>
       </div>
     </div></Layout>
   );
+
 
 };
 
