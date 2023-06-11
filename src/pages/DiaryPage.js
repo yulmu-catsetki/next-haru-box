@@ -16,7 +16,7 @@ const DiaryPage = () => {
   const { data: session, status } = useSession();
 
   const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
-  const MAX_GENERATE_TIMES = 5; // 하루에 생성할 수 있는 그림의 최대 횟수
+  const MAX_GENERATE_TIMES = 6; // 하루에 생성할 수 있는 그림의 최대 횟수
 
   const [isLoading, setLoading] = useState(false);
 
@@ -29,8 +29,9 @@ const DiaryPage = () => {
 
   // 남은 생성 횟수
   const [generateTimes, setGenerateTimes] = useState(MAX_GENERATE_TIMES);
-
   const [dummyMode, setDummyMode] = useState(false); // 테스트 용
+
+
 
   const handleSaveDiary = async () => {
 
@@ -133,6 +134,8 @@ const DiaryPage = () => {
       setGenerateTimes(MAX_GENERATE_TIMES);
     }
   };
+  
+  const { changeEmotion } = useAudio();
 
 
   const handleGenerateImage_Dummy = () => {
@@ -199,7 +202,7 @@ const DiaryPage = () => {
         console.log("generateTimes: " + generateTimes);
         return true;
       } else {
-        alert(`하루에 ${MAX_GENERATE_TIMES}번만 그림을 생성할 수 있습니다.`);
+        alert(`하루에 ${MAX_GENERATE_TIMES - 1}번만 그림을 생성할 수 있습니다.`);
         return false;
       }
     };
@@ -240,12 +243,6 @@ const DiaryPage = () => {
     }
   };
   const handleGenerateImage_Dream = async () => {
-
-    if (content.trim() === '') {
-      alert('일기 내용을 입력하세요!');
-      return;
-    }
-
     console.log("prompt: " + content);
 
     // 그림 생성 전에 로컬 스토리지를 확인하고 제한 횟수를 확인하는 함수
@@ -277,12 +274,29 @@ const DiaryPage = () => {
 
       setImgUrl(res.data.imageUrl);
       setImgB64(res.data.imgB64);
+
+      setIsDiaryFinished(true);
+
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false); // 로딩 완료
     }
   };
+
+  const [isDiaryFinished, setIsDiaryFinished] = useState(false);
+
+  const handleFinishDiary = () => {
+
+    if (content.trim() === '') {
+      alert('일기 내용을 입력하세요!');
+      return;
+    }
+
+    handleGenerateImage_Dream();
+  };
+
+
   const handleContentChange = (e) => setContent(e.target.value);
   const handleEmotionChange = (val) => setEmotion(val);
   const handleDummyModeChange = () => setDummyMode(!dummyMode);
@@ -373,14 +387,16 @@ const DiaryPage = () => {
                     onChange={handleContentChange}
                     maxLength={MAX_CONTENT_LENGTH}
                     placeholder="일기를 작성하세요..."
-                    className="w-full h-40 px-3 py-2 mb-6 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
+                    disabled={isDiaryFinished}
+                    className="w-full h-3/5 flex-grow px-3 py-2 mb-0 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
+                    style={{ flexBasis: '60%', fontFamily: 'CustomFont, sans-serif', fontSize: 25 }}
                   />
                   <div className=" right-3 bottom-3 text-xs text-gray-400">
                     {`${content.length}/${MAX_CONTENT_LENGTH}`}
                   </div>
-          
-                <p>‍</p>
-                <div className="flex justify-center mb-6">
+
+                  <p>‍</p>
+                  <div className="flex justify-center mb-6">
                     {[
                       '😐', // Neutral
                       '😀', // Joy
@@ -388,63 +404,63 @@ const DiaryPage = () => {
                       '😡', // Anger
                     ].map((val, index) => (
                       <button
-                        key={index}
-                        onClick={() => handleEmotionChange(index)}
-                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index ? 'bg-blue-500' : 'bg-white'
+                        key={index + 1}
+                        onClick={() => handleEmotionChange(index + 1)}
+                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
                           }`}
                       >
                         {val}
                       </button>
                     ))}
+                  </div>
+                  <button
+                    onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
+                    className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
+                  >
+                    그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
+                  </button>
+
                 </div>
-                      <button
-                  onClick={dummyMode ? handleGenerateImage_Dummy : handleGenerateImage_Dream}
-                  className="w-full md:w-1/2 px-4 py-2 mb-6 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline"
-                >
-                  그림 생성 {generateTimes}/{MAX_GENERATE_TIMES}
-                </button>
-                
               </div>
             </div>
           </div>
-        </div>
-        <div className="center"></div>
-        <div className="right-side">
-          <div className="book-cover-right"></div>
-          <div className="layer1">
-            <div className="page-right"></div>
-          </div>
-          <div className="layer2 right">
-            <div className="page-right"></div>
-          </div>
-          <div className="layer3 right">
-            <div className="page-right"></div>
-          </div>
-          <div className="layer4 right">
-            <div className="page-right"></div>
-          </div>
-          <div className="layer-text right">
-            <div className="page-right-2">
-              <div className="page-text w-richtext">
-                {/* Placeholder for DiaryPage content */}
-                <div className="bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg aspect-ratio-container" 
+          <div className="center"></div>
+          <div className="right-side">
+            <div className="book-cover-right"></div>
+            <div className="layer1">
+              <div className="page-right"></div>
+            </div>
+            <div className="layer2 right">
+              <div className="page-right"></div>
+            </div>
+            <div className="layer3 right">
+              <div className="page-right"></div>
+            </div>
+            <div className="layer4 right">
+              <div className="page-right"></div>
+            </div>
+            <div className="layer-text right">
+              <div className="page-right-2">
+                <div className="page-text w-richtext">
+                  {/* Placeholder for DiaryPage content */}
+                  <div className="bg-white rounded-lg shadow-md flex items-center justify-center text-gray-500 text-lg aspect-ratio-container"
                     style={{ paddingTop: '66.6667%' }}>
-                      {imgUrl ? <img src={imgUrl} alt="Generated Art" className="object-contain h-full" /> : <div className="justify-center items-center"><p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p></div>}</div>
+                    {imgUrl ? <img src={imgUrl} alt="Generated Art" className="object-contain h-full" /> : <div className="justify-center items-center"><p className="text-xl font-bold">이 곳에 생성된 그림이 표시됩니다.</p></div>}</div>
 
 
-                <button
-                  onClick={handleSaveDiary}
-                  className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
-                >
-                  일기 저장
-                </button>
-                
+                  <button
+                    onClick={handleSaveDiary}
+                    className="w-full md:w-1/2 px-4 py-2 mt-4 font-bold text-white bg-green-500 rounded-full hover:bg-green-400 focus:outline-none focus:shadow-outline"
+                  >
+                    일기 저장
+                  </button>
+
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
      
 

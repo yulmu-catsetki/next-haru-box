@@ -46,7 +46,7 @@ export default async (req, res) => {
                 style: styleId,
                 prompt,
                 target_image_weight: 0.1,
-                width: 800,
+                width: 900,
                 height: 600,
             },
         };
