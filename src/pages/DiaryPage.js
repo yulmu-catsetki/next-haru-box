@@ -82,8 +82,9 @@ const DiaryPage = () => {
       console.log('Diary successfully written!');
       alert('일기가 정상적으로 저장되었습니다.');
 
-      console.log('diary done! change emotion to: ' + emotion);
-      changeEmotion(emotion);
+      router.push('/MainPage');
+      // changeEmotion(emotion);
+
 
     } catch (e) {
       console.error('Error writing document: ', e);
