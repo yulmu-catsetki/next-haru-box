@@ -68,6 +68,8 @@ export const AudioProvider = ({ children }) => {
     const setBGMVolume = (volume) => {
         if (volume >= 0 && volume <= 1) {
             BGMRef.current.volume = volume;
+            BGMRef.current.muted = volume === 0; // 추가: 음소거 상태 설정
+            localStorage.setItem('bgmVolume', volume); // localStorage에 저장
         } else {
             console.warn('볼륨 값은 0과 1 사이여야 합니다.');
         }
@@ -76,6 +78,8 @@ export const AudioProvider = ({ children }) => {
     const setBGSVolume = (volume) => {
         if (volume >= 0 && volume <= 1) {
             BGSRef.current.volume = volume;
+            BGSRef.current.muted = volume === 0; // 추가: 음소거 상태 설정
+            localStorage.setItem('bgsVolume', volume); // localStorage에 저장
         } else {
             console.warn('볼륨 값은 0과 1 사이여야 합니다.');
         }
@@ -104,13 +108,36 @@ export const AudioProvider = ({ children }) => {
         // playBGS();
     };
 
+    const loadVolumeSettings = () => {
+        const savedBGMVolume = localStorage.getItem('bgmVolume');
+        const savedBGSVolume = localStorage.getItem('bgsVolume');
+    
+        if (savedBGMVolume !== null) {
+            BGMRef.current.volume = savedBGMVolume;
+            BGMRef.current.muted = savedBGMVolume === 0;
+        }
+    
+        if (savedBGSVolume !== null) {
+            BGSRef.current.volume = savedBGSVolume;
+            BGSRef.current.muted = savedBGSVolume === 0;
+        }
+    };
+    
+    // 컴포넌트가 마운트될 때 볼륨 설정을 불러옵니다.
+    useEffect(() => {
+        loadVolumeSettings();
+    }, []);
+
     useEffect(() => {
         // 오디오가 끝났을 때 랜덤한 곡을 재생하는 함수를 정의합니다.
-        const ChangeRandomBGM = () => {
-            const randomIndex = Math.floor(Math.random() * BGMList.length);
-            changeBGM(randomIndex);
-            playBGM();
-        };
+        
+        //const ChangeRandomBGM = () => {
+        //    const randomIndex = Math.floor(Math.random() * BGMList.length);
+        //    changeBGM(randomIndex);
+        //    playBGM();
+        //};
+
+        loadVolumeSettings();
 
         // 오디오가 끝났을 때 랜덤한 곡을 재생하는 이벤트 리스너를 등록합니다.
         // BGMRef.current.addEventListener('ended', ChangeRandomBGM);

@@ -60,7 +60,7 @@ const Layout = ({ children, delay = 0 }) => {
 
   return (
     <div>
-      {/* 설정 버튼 */}
+
       <div className="absolute bottom-0 left-0 m-5 z-10">
         <div
           className="cursor-pointer"
@@ -69,7 +69,6 @@ const Layout = ({ children, delay = 0 }) => {
           {configIcon}
         </div>
       </div>
-
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-20 flex items-center justify-center">
           <div className="bg-white rounded-lg p-8 relative">
@@ -131,6 +130,14 @@ const Layout = ({ children, delay = 0 }) => {
       )}
 
       <div className="fixed top-0 right-0 m-2 flex items-center text-white z-10">
+
+              {/* 설정 버튼 */}
+        <div
+          className="cursor-pointer mr-2"
+          onClick={() => setIsModalOpen(true)}
+        >
+          {configIcon}
+        </div>
         {/* 현재 재생 중인 BGM 제목 */}
         <div className="mr-2 font-pointer">{musicIcon}</div>
         <span className="mr-2 font-pointer">{currentBGMName}</span>
