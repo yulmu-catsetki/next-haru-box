@@ -60,15 +60,6 @@ const Layout = ({ children, delay = 0 }) => {
 
   return (
     <div>
-
-      <div className="absolute bottom-0 left-0 m-5 z-10">
-        <div
-          className="cursor-pointer"
-          onClick={() => setIsModalOpen(true)}
-        >
-          {configIcon}
-        </div>
-      </div>
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-20 flex items-center justify-center">
           <div className="bg-white rounded-lg p-8 relative">
@@ -127,7 +118,7 @@ const Layout = ({ children, delay = 0 }) => {
             </div>
           </div>
         </div>
-      )}
+      )}  
 
       <div className="fixed top-0 right-0 m-2 flex items-center text-white z-10">
 
@@ -149,7 +140,7 @@ const Layout = ({ children, delay = 0 }) => {
       </div>
 
       <motion.div
-        initial={{ y: 50, opacity: 0 }}
+        initial={{ y : 50, opacity: 0 }}
         animate={{
           y: 0,
           opacity: 1,
