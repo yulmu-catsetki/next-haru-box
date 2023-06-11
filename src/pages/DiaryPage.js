@@ -87,7 +87,7 @@ const DiaryPage = () => {
     }
 
     setContent('');
-    setEmotion(1);
+    setEmotion(0);
     setImgUrl('');
     setImgB64('');
   };
@@ -382,9 +382,9 @@ const DiaryPage = () => {
                       '😡', // Anger
                     ].map((val, index) => (
                       <button
-                        key={index + 1}
-                        onClick={() => handleEmotionChange(index + 1)}
-                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index + 1 ? 'bg-blue-500' : 'bg-white'
+                        key={index}
+                        onClick={() => handleEmotionChange(index)}
+                        className={`w-12 h-12 rounded-full border-2 border-gray-300 focus:outline-none mx-2 ${emotion === index ? 'bg-blue-500' : 'bg-white'
                           }`}
                       >
                         {val}
