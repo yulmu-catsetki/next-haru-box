@@ -12,7 +12,6 @@ export default function Home() {
 
   return (
     <div className="App">
-      <h1>3D Website</h1>
       {router.pathname === '/' && <StartPage setIsLoggedIn={setIsLoggedIn} />}
       {isLoggedIn && router.pathname.startsWith('/MainPage') && <MainPage />}
       {router.pathname === '/DiaryPage' && <DiaryPage />}

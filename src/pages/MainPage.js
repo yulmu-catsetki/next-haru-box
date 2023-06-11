@@ -7,6 +7,8 @@ import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import * as THREE from 'three';
 import { useSession, signOut } from 'next-auth/react';
 import { IconLogout, IconLogin } from "@tabler/icons-react";
+import Layout from '../components/Layout';
+import { useAudio } from '../contexts/AudioContext';
 import '/public/font.css';
 
 
@@ -27,39 +29,11 @@ const MainPage = () => {
     console.log('Dashboard clicked');
     setDashboardClicked(true);
     router.push("/DashboardPage");
-    
+
   };
   const handleDiaryClick = () => {
 
-    const getLastDiary = () => {
-      if (diaries.length === 0) {
-        return null;
-      }
-      return diaries[diaries.length - 1];
-    };
-
-    const lastDiary = getLastDiary();
-
-    if (lastDiary) {
-      const seconds = lastDiary.date.seconds;
-      const nanoseconds = lastDiary.date.nanoseconds;
-
-      const timestampInMilliseconds = (seconds * 1000) + (nanoseconds / 1000000);
-
-      const lastDiaryTime = new Date(timestampInMilliseconds);
-      const now = new Date();
-
-      // console.log("lastDiaryTime: " + lastDiaryTime);
-      // console.log("now: " + now);
-
-      var nowMonth = now.getMonth();
-      var nowDate = now.getDate();
-
-      var lastDiaryMonth = lastDiaryTime.getMonth();
-      var lastDiaryDate = lastDiaryTime.getDate();
-    }
-
-    if (lastDiary && nowMonth == lastDiaryMonth && nowDate == lastDiaryDate) { // 오늘 일기 이미 작성함
+    if (isLastDiaryToday()) { // 오늘 일기 이미 작성함
       alert("오늘 일기를 이미 작성하였습니다.");
     } else {
       router.push('/DiaryPage'); // Replace '/DiaryPage' with the actual path of your DiaryPage component
@@ -73,6 +47,35 @@ const MainPage = () => {
     return `${year}${month}${day}`;
   };
 
+  const getLastDiary = () => {
+    if (diaries.length === 0) {
+      return null;
+    }
+    return diaries[diaries.length - 1];
+  };
+
+  // 마지막 일기가 오늘 일기인지 확인
+  const isLastDiaryToday = () => {
+    const lastDiary = getLastDiary();
+    if (!lastDiary) {
+      return null;
+    }
+    const seconds = lastDiary.date.seconds;
+    const nanoseconds = lastDiary.date.nanoseconds;
+
+    const timestampInMilliseconds = (seconds * 1000) + (nanoseconds / 1000000);
+
+    const lastDiaryTime = new Date(timestampInMilliseconds);
+    const now = new Date();
+    
+    const nowMonth = now.getMonth();
+    const nowDate = now.getDate();
+
+    const lastDiaryMonth = lastDiaryTime.getMonth();
+    const lastDiaryDate = lastDiaryTime.getDate();
+
+    return (nowMonth == lastDiaryMonth && nowDate == lastDiaryDate)
+  }
 
   const { data: session } = useSession();
 
@@ -81,33 +84,64 @@ const MainPage = () => {
       //router.push('/auth/signin');
     }
   }, [session?.user?.id, router]);
- 
+
   const [diaries, setDiaries] = useState([]);
   const getDiaries = async () => {
     if (!session || !session.user || !session.user.id) {
       // Handle the case when session or session.user or session.user.id is undefined
       return;
     }
-  
+    
     const diaryCollection = collection(db, 'users', session.user.id, 'diaries');
     const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
-  
+
     const fetchedDiaries = result.docs.map((doc) => {
       return { id: doc.id, ...doc.data() };
     });
     setDiaries(fetchedDiaries);
   };
-  
+
+
+
   useEffect(() => {
     if (session) {
       getDiaries();
     }
   }, [session]);
 
+  // BGS/BGM 관련
+  const { BGMRef, BGSRef, playBGM, playBGS, changeEmotion } = useAudio();
+
+  useEffect(() => {
+    SetBGM();
+    setTimeout(() => {
+      BGMRef.current.muted = false;
+      BGSRef.current.muted = false;
+      playBGM();
+      playBGS();
+    }, 1000); // 1000 밀리초 (1초) 후에 muted를 false로 설정합니다.
+
+  }, [diaries]);
+
+  const SetBGM = () => {
+    // BGM 설정
+    if(isLastDiaryToday() === null){
+      return;
+    }
+
+    if (isLastDiaryToday()) {
+      const lastDiary = getLastDiary();
+      const emotion = lastDiary?.emotion ? lastDiary.emotion : 0;
+      changeEmotion(emotion);
+    } else {
+      changeEmotion(0);
+    }
+  };
+
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      <div className="">
+    <Layout delay={0.8}>
+      <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
         {session ? (
         <div className="grid grid-cols-[1fr_auto_1fr] items-center p-2 bg-[#6096B4]">  
           <p className="col-start-2 mr-auto mb-4 font-['CustomFont'] text-[48px] font-bold text-gray-100">
@@ -127,15 +161,13 @@ const MainPage = () => {
           </button>
         </div>
         )}
-        
-        
+        <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
+          <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
+        </Canvas>
       </div>
-      <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
-        <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
-      </Canvas>
-
-    </div>
+    </Layout>
   );
+
 };
 
 export default MainPage;

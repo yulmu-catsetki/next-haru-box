@@ -5,9 +5,10 @@ import "firebase/firestore";
 import { db } from "../firebase";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import DashboardPageEach from '../components/DashboardPageEach';
-
+import Layout from '../components/Layout';
+import './polaroid.css';
+import '/public/font.css';
 const DashboardPage = () => {
 
   const COLUMN_NUM = 5; // 일기 배열 가로 크기
@@ -23,7 +24,10 @@ const DashboardPage = () => {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [diaryToDelete, setDiaryToDelete] = useState(null);
-
+  const backIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+</svg>
+);
 
   const addDummyDiary = () => {
     const dummyDiary = {
@@ -41,12 +45,15 @@ const DashboardPage = () => {
     const diaryCollection = collection(db, "users", session.user.id, "diaries");
     const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
-
+  
     const fetchedDiaries = result.docs.map((doc) => {
       return { id: doc.id, ...doc.data() };
     });
-    setDiaries(fetchedDiaries);
-  }
+  
+    // Reverse the order of fetched diaries
+    const reversedDiaries = fetchedDiaries.reverse();
+    setDiaries(reversedDiaries);
+  };
 
   const handleDiaryClick = (diary) => {
     setSelectedDiary(diary);
@@ -115,40 +122,19 @@ const DashboardPage = () => {
 
 
 return (
-  <div className="p-4">
-    <div className="flex self-start items-center mb-4">
-      <button
-        onClick={() => router.push('/MainPage')}
-        className="px-2 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-400 focus:outline-none focus:shadow-outline w-8 h-8 flex items-center justify-center"
-      >
-        ←
-      </button>
-      <div className="flex items-center bg-gray-200 p-2 rounded ml-2">
-        {session ? (
-          <>
-            <img
-              src={session.user.image}
-              alt="Profile Picture"
-              className="rounded-full h-8 w-8 mr-2"
-            />
-            <p className="text-xs font-bold text-gray-800">
-              Logged in as {session?.user?.name}
-            </p>
-          </>
-        ) : (
-          <p className="text-xs font-bold text-gray-800">
-            Not logged in
-          </p>
-        )}
-      </div>
-    </div>
-    {/* 더미 데이터 추가 버튼 */}
-    <button
-      onClick={addDummyDiary}
-      className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 mb-4"
-    >
-      Add Dummy Diary
-    </button>
+  <Layout><div className="p-4">
+    {/* 뒤로 가기 버튼*/}
+    <div className="flex self-start items-center mb-4" style={{ zIndex: 10, position: 'absolute', top: '5px', left: '10px' }}>
+          <button
+            onClick={() => router.push('/MainPage')}
+            className="flex items-center space-x-2 px-4 py-2 font-bold text-white bg-transparent rounded-full focus:outline-none focus:shadow-outline"
+          >
+            <div>{backIcon}</div>
+            <div>메인으로 돌아가기</div>
+          </button>
+
+        </div>
+
 
     {/* 페이지네이션 컨트롤 */}
     <div className="flex justify-center my-4">
@@ -160,7 +146,7 @@ return (
           Previous Page
         </button>
       )}
-      <span className="align-middle self-center mx-4 text-lg font-semibold text-blue-500">
+      <span className="align-middle self-center mx-4 text-lg font-semibold text-white-500">
         Page {currentPage} of {totalPages}
       </span>
       {currentPage < totalPages && (
@@ -173,54 +159,35 @@ return (
       )}
     </div>
 
-    {/* 일기 그리드 */}
-    <div className={`grid grid-cols-5 gap-4 px-20`}>
+  {/* 일기 그리드 */}
+  <div className={`grid grid-cols-5 gap-4 px-20`}>
+    <ul>
       {paginatedDiaries &&
         Array(itemsPerPage).fill(null).map((_, idx) => {
           const diary = paginatedDiaries[idx];
           return diary ? (
-            <div
+            <li
               key={paginatedDiaries[idx].id}
-              className="rounded overflow-hidden shadow-lg flex flex-col justify-between min-h-[24rem]"
+              className="rounded overflow-hidden shadow-lg relative"
               onClick={() => handleDiaryClick(diary)} // Added onClick event handler
             >
               <img
-                className="w-full h-64 object-cover cursor-pointer" // Added cursor-pointer
+                className="w-full h-64 object-cover"
                 src={diary.imgUrl}
                 alt="Diary"
               />
-              <div className="px-6 py-4 flex-grow overflow-hidden">
-                <div className="font-bold text-xl mb-2">
-                  {diary.date instanceof Date
-                    ? diary.date.toLocaleDateString()
-                    : diary.date.toDate().toLocaleDateString()}
-                </div>
-                <p className="text-gray-700 text-base line-clamp-3 overflow-ellipsis">
-                  {diary.content}
-                </p>
-              </div>
-              <div className="px-6 pt-4 pb-2 flex items-center justify-between">
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-lg font-bold text-gray-700 mr-2">
-                  {['', '😐', '😀', '😭', '😡'][diary.emotion]}
-                </span>
-                <button
-                  className="inline-block bg-red-200 rounded-md px-3 py-1 text-lg font-bold text-gray-700 mr-2"
-                  onClick={() => openDeleteModal(diary.id)}
-                >
-                  🗑
-                </button>
-              </div>
-            </div>
+              <p className="custom-font">
+                {diary.date instanceof Date
+                  ? diary.date.toLocaleDateString()
+                  : diary.date.toDate().toLocaleDateString()}
+              </p>
+            </li>
           ) : (
-            <div
-              key={idx}
-              className="rounded overflow-hidden shadow-lg flex items-center justify-center text-xl min-h-[24rem]"
-            >
-              📝
-            </div>
+            null
           );
         })}
-    </div>
+    </ul>
+  </div>
 
     {/* 삭제 모달 */}
     {isDeleteModalOpen && (
@@ -265,11 +232,15 @@ return (
       </div>
     )}
 
-    {/* 일기 모달 */}
-    {isDiaryModalOpen && (
-      <DashboardPageEach diary={selectedDiary} onClose={handleCloseDiary} onDelete={openDeleteModal} />
-    )}
-  </div>
+      {/* 일기 모달 */}
+  {isDiaryModalOpen && (
+
+      
+        <DashboardPageEach diary={selectedDiary} onClose={handleCloseDiary} onDelete={openDeleteModal} />
+
+
+  )}
+  </div></Layout>
 );
 
 
