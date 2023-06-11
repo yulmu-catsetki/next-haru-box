@@ -95,58 +95,6 @@ const MainPage = () => {
     }
   }, [session]);
 
-  // BGM 관련
-
-  const [isPlaying, setIsPlaying] = useState(true);
-
-  const audioRef = useRef(null);
-  const [audioFiles, setAudioFiles] = useState([]);
-
-  // 현재 재생 중인 트랙의 인덱스
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(Math.floor(Math.random() * audioFiles.length));
-
-  // 트랙이 끝나면 다음 랜덤 트랙 재생
-  const handleTrackEnd = () => {
-    const randomIndex = Math.floor(Math.random() * audioFiles.length);
-    setCurrentTrackIndex(randomIndex);
-  };
-
-  useEffect(() => {
-    // 트랙이 끝났을 때 이벤트 리스너 설정
-    const audioElement = audioRef.current;
-    
-    if (audioElement) {
-      audioElement.addEventListener("ended", handleTrackEnd);
-
-      return () => {
-        // 컴포넌트 unmount시 이벤트 리스너 제거
-        audioElement.removeEventListener("ended", handleTrackEnd);
-      };
-    }
-}, [audioFiles]); // 의존성 배열에 audioFiles 추가
-
-
-  useEffect(() => {
-    // Fetch audio files from the API
-    fetch('/api/audioFiles')
-      .then(response => response.json())
-      .then(files => {
-        // Prepend the directory path to each file
-        const filePaths = files.map(file => `/audio/bgm/${file}`);
-        setAudioFiles(filePaths);
-      })
-      .catch(error => console.error('Error fetching audio files:', error));
-  }, []);
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
   return (
     <Layout delay={0.8}>
       <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
