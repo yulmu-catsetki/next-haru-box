@@ -114,44 +114,6 @@ const MainPage = () => {
   return (
     <Layout delay={0.8}>
       <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-        {/* BGM 재생/정지 버튼 */}
-        <button
-          onClick={toggleBGM}
-          style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000 }}
-        >
-          {isBGMPlaying ? 'BGM정지' : 'BGM재생'}
-        </button>
-
-        {/* BGM 노래 변경 버튼 */}
-        {[0, 1, 2, 3].map((index) => (
-          <button
-            onClick={() => changeBGM(index)}
-            style={{ position: 'absolute', top: '10px', left: `${100 + index * 60}px`, zIndex: 1000 }}
-            key={index}
-          >
-            BGM {index + 1}
-          </button>
-        ))}
-
-        {/* BGS 재생/정지 버튼 */}
-        <button
-          onClick={toggleBGS}
-          style={{ position: 'absolute', top: '50px', left: '10px', zIndex: 1000 }}
-        >
-          {isBGSPlaying ? 'BGS정지' : 'BGS재생'}
-        </button>
-
-        {/* BGS 노래 변경 버튼 */}
-        {[0, 1, 2, 3].map((index) => (
-          <button
-            onClick={() => changeBGS(index)}
-            style={{ position: 'absolute', top: '50px', left: `${100 + index * 60}px`, zIndex: 1000 }}
-            key={index}
-          >
-            BGS {index + 1}
-          </button>
-        ))}
-
         <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
           <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
         </Canvas>
