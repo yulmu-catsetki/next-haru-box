@@ -5,10 +5,10 @@ import "firebase/firestore";
 import { db } from "../firebase";
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import DashboardPageEach from '../components/DashboardPageEach';
 import Layout from '../components/Layout';
-
+import './polaroid.css';
+import '/public/font.css';
 const DashboardPage = () => {
 
   const COLUMN_NUM = 5; // 일기 배열 가로 크기
@@ -42,12 +42,15 @@ const DashboardPage = () => {
     const diaryCollection = collection(db, "users", session.user.id, "diaries");
     const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
-
+  
     const fetchedDiaries = result.docs.map((doc) => {
       return { id: doc.id, ...doc.data() };
     });
-    setDiaries(fetchedDiaries);
-  }
+  
+    // Reverse the order of fetched diaries
+    const reversedDiaries = fetchedDiaries.reverse();
+    setDiaries(reversedDiaries);
+  };
 
   const handleDiaryClick = (diary) => {
     setSelectedDiary(diary);
@@ -143,13 +146,7 @@ return (
         )}
       </div>
     </div>
-    {/* 더미 데이터 추가 버튼 */}
-    <button
-      onClick={addDummyDiary}
-      className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 mb-4"
-    >
-      Add Dummy Diary
-    </button>
+
 
     {/* 페이지네이션 컨트롤 */}
     <div className="flex justify-center my-4">
@@ -161,7 +158,7 @@ return (
           Previous Page
         </button>
       )}
-      <span className="align-middle self-center mx-4 text-lg font-semibold text-blue-500">
+      <span className="align-middle self-center mx-4 text-lg font-semibold text-white-500">
         Page {currentPage} of {totalPages}
       </span>
       {currentPage < totalPages && (
@@ -174,54 +171,35 @@ return (
       )}
     </div>
 
-    {/* 일기 그리드 */}
-    <div className={`grid grid-cols-5 gap-4 px-20`}>
+  {/* 일기 그리드 */}
+  <div className={`grid grid-cols-5 gap-4 px-20`}>
+    <ul>
       {paginatedDiaries &&
         Array(itemsPerPage).fill(null).map((_, idx) => {
           const diary = paginatedDiaries[idx];
           return diary ? (
-            <div
+            <li
               key={paginatedDiaries[idx].id}
-              className="rounded overflow-hidden shadow-lg flex flex-col justify-between min-h-[24rem]"
+              className="rounded overflow-hidden shadow-lg relative"
               onClick={() => handleDiaryClick(diary)} // Added onClick event handler
             >
               <img
-                className="w-full h-64 object-cover cursor-pointer" // Added cursor-pointer
+                className="w-full h-64 object-cover"
                 src={diary.imgUrl}
                 alt="Diary"
               />
-              <div className="px-6 py-4 flex-grow overflow-hidden">
-                <div className="font-bold text-xl mb-2">
-                  {diary.date instanceof Date
-                    ? diary.date.toLocaleDateString()
-                    : diary.date.toDate().toLocaleDateString()}
-                </div>
-                <p className="text-gray-700 text-base line-clamp-3 overflow-ellipsis">
-                  {diary.content}
-                </p>
-              </div>
-              <div className="px-6 pt-4 pb-2 flex items-center justify-between">
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-lg font-bold text-gray-700 mr-2">
-                  {['', '😐', '😀', '😭', '😡'][diary.emotion]}
-                </span>
-                <button
-                  className="inline-block bg-red-200 rounded-md px-3 py-1 text-lg font-bold text-gray-700 mr-2"
-                  onClick={() => openDeleteModal(diary.id)}
-                >
-                  🗑
-                </button>
-              </div>
-            </div>
+              <p className="custom-font">
+                {diary.date instanceof Date
+                  ? diary.date.toLocaleDateString()
+                  : diary.date.toDate().toLocaleDateString()}
+              </p>
+            </li>
           ) : (
-            <div
-              key={idx}
-              className="rounded overflow-hidden shadow-lg flex items-center justify-center text-xl min-h-[24rem]"
-            >
-              📝
-            </div>
+            null
           );
         })}
-    </div>
+    </ul>
+  </div>
 
     {/* 삭제 모달 */}
     {isDeleteModalOpen && (
@@ -266,10 +244,14 @@ return (
       </div>
     )}
 
-    {/* 일기 모달 */}
-    {isDiaryModalOpen && (
-      <DashboardPageEach diary={selectedDiary} onClose={handleCloseDiary} onDelete={openDeleteModal} />
-    )}
+      {/* 일기 모달 */}
+  {isDiaryModalOpen && (
+
+      
+        <DashboardPageEach diary={selectedDiary} onClose={handleCloseDiary} onDelete={openDeleteModal} />
+
+
+  )}
   </div></Layout>
 );
 
