@@ -46,7 +46,7 @@ export function Outside({ diaries }) {
       case 2:
         return '/models/rainy.jpg';
       case 3:
-        return '/models/lightening.jpg';
+        return '/models/lightning.jpg';
       default:
         return '/models/default.jpg';
     }
