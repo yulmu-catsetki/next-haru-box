@@ -4,7 +4,7 @@ const DashboardPageEach = ({ diary, onClose, onDelete }) => {
 
 
     const getEmotionIcon = (emotion) => {
-        switch (emotion) {
+        switch (emotion+1) {
             case 1:
                 return '😐'; // Neutral
             case 2:
