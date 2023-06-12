@@ -17,7 +17,7 @@ const DiaryPage = () => {
   const { data: session, status } = useSession();
 
   const MAX_CONTENT_LENGTH = 140;  // 일기 글자수 제한
-  const MAX_GENERATE_TIMES = 6; // 하루에 생성할 수 있는 그림의 최대 횟수
+  const MAX_GENERATE_TIMES = 5; // 하루에 생성할 수 있는 그림의 최대 횟수
 
   const [isLoading, setLoading] = useState(false);
 
@@ -203,10 +203,6 @@ const DiaryPage = () => {
         console.log("generateTimes: " + generateTimes);
         return true;
       } else {
-        // 생성 가능 횟수 회복 (과제전, 테스트 용)
-        setGenerateTimes(MAX_GENERATE_TIMES);
-
-        //alert(`하루에 ${MAX_GENERATE_TIMES - 1}번만 그림을 생성할 수 있습니다.`);
         return false;
       }
     };
@@ -256,12 +252,20 @@ const DiaryPage = () => {
       let storedTimes = Number(localStorage.getItem('generateTimes'));
 
       if (storedTimes > 0) {
-        localStorage.setItem('generateTimes', String(storedTimes - 1));
-        setGenerateTimes(storedTimes - 1);
+        // 생성 가능 횟수 회복 (과제전, 테스트 용)
+        if (storedTimes != 1) {
+          localStorage.setItem('generateTimes', String(storedTimes - 1));
+          setGenerateTimes(storedTimes - 1);
 
-        console.log("generateTimes: " + generateTimes);
+          console.log("generateTimes: " + generateTimes);
+        }else{
+          localStorage.setItem('generateTimes', String(MAX_GENERATE_TIMES));
+          setGenerateTimes(MAX_GENERATE_TIMES);
+        }
         return true;
-      } else {
+      } 
+      else 
+      {
         alert(`하루에 ${MAX_GENERATE_TIMES}번만 그림을 생성할 수 있습니다.`);
         return false;
       }
@@ -297,6 +301,7 @@ const DiaryPage = () => {
       return;
     }
 
+    setGenerateTimes(generateTimes + 1);
     handleGenerateImage_Dream();
   };
 
@@ -393,8 +398,8 @@ const DiaryPage = () => {
                     placeholder="일기를 작성하세요..."
                     disabled={isDiaryFinished}
                     className="w-full h-3/5 flex-grow px-3 py-2 mb-0 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
-                    style={{ flexBasis: '60%', fontFamily: 'CustomFont, sans-serif', fontSize: 25,  lineHeight: '1'}}
-                    
+                    style={{ flexBasis: '60%', fontFamily: 'CustomFont, sans-serif', fontSize: 25, lineHeight: 'z' }}
+
                   />
                   <div className="flex flex-col w-full px-3 py-1">
                     <div className="flex items-start">
@@ -469,7 +474,7 @@ const DiaryPage = () => {
                       disabled={!isDiaryFinished}
                       className={`w-full px-10 py-2.5 mt-3 font-bold rounded-full focus:outline-none focus:shadow-outline ${isDiaryFinished ? 'text-white bg-blue-500 hover:bg-blue-400' : 'text-gray-500 bg-gray-300'}`}
                     >
-                      다시 그리기 ({generateTimes}/{MAX_GENERATE_TIMES - 1})
+                      다시 그리기 ({generateTimes}/{MAX_GENERATE_TIMES})
                     </button>
                   </div>
 
