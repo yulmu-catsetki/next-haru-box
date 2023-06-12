@@ -143,7 +143,7 @@ const MainPage = () => {
     <Layout router={router} session={session} delay={0.8}>
       <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
         {session ? (
-          <div className="fixed top-0.5 z-10 w-screen flex justify-start items-center">
+          <div className="fixed top-0.5 z-[5] w-screen flex justify-start items-center">
             <button className="justify-self-start ml-3" onClick={() => confirmSignOut()}>
               <IconLogout className="w-8 h-8 px-1.5 py-1.5 rounded-full focus:outline-none focus:shadow-outline" style={{ stroke: "white" }} />
             </button>
@@ -152,7 +152,7 @@ const MainPage = () => {
             </p>
           </div>
         ) : (
-          <div className="fixed top-0.5 z-10 w-screen flex justify-start items-center">
+          <div className="fixed top-0.5 z-[5] w-screen flex justify-start items-center">
             <button className="justify-self-start ml-3" onClick={() => router.push('/auth/signin')}>
               <IconLogin className="w-8 h-8 px-1.5 py-1.5 rounded-full focus:outline-none focus:shadow-outline" style={{ stroke: "black" }} />
             </button>
