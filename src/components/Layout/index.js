@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
 import { useAudio } from '../../contexts/AudioContext';
 import { useState } from "react";
-import { IconLogout, IconLogin } from "@tabler/icons-react";
 
-const Layout = ({ isMain = false, router, session, onSignOut, children, delay = 0 }) => {
+const Layout = ({ router, session, onSignOut, children, delay = 0 }) => {
 
   const { BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, currentBGMName, toggleBGM, toggleBGS, setBGMVolume, setBGSVolume } = useAudio();
 
@@ -17,6 +16,7 @@ const Layout = ({ isMain = false, router, session, onSignOut, children, delay = 
 
   // 모달 상태를 관리하는 state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
   const muteIcon = (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -57,6 +57,11 @@ const Layout = ({ isMain = false, router, session, onSignOut, children, delay = 
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
     </svg>
+  );
+
+  const infoIcon = (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+  </svg>
   );
 
   return (
@@ -119,11 +124,89 @@ const Layout = ({ isMain = false, router, session, onSignOut, children, delay = 
             </div>
           </div>
         </div>
-      )}  
+      )}
+
+      {isInfoModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 w-4/5 max-w-2xl relative">
+            <button
+              onClick={() => setIsInfoModalOpen(false)}
+              className="absolute top-4 right-4 text-2xl"
+            >
+              {closeIcon}
+            </button>
+
+            {/* 모달 내용 시작 */}
+            <h1
+              className="text-2xl font-semibold mb-4 leading-relaxed"
+              style={{
+                fontFamily: 'CustomFont, sans-serif',
+                fontSize: 45,
+                color: '#6096B4',
+              }}
+            >
+              당신의 하루를 그림으로 담아보세요.
+            </h1>
+
+            <p className="text-s text-gray-700 mb-6 leading-relaxed">
+              하루상자는 당신의 하루를 담은 일기를 그림으로 그려주는 웹사이트입니다.
+            </p>
+
+            <div className="mb-4">
+              <h2
+                className="text-xl font-semibold mb-2 leading-relaxed"
+                style={{
+                  fontFamily: 'CustomFont, sans-serif',
+                  fontSize: 26,
+                  color: '#6096B4',
+                }}
+              >
+                오늘 일기 쓰러가기
+              </h2>
+              <p className="ml-4 text-sm text-gray-700 leading-relaxed">오늘의 일기를 작성할 수 있습니다.</p>
+              <p className="ml-4 text-sm text-gray-700 leading-relaxed">일기에는 본문과 그 날의 감정을 기록할 수 있습니다.</p>
+              <p className="ml-4 text-sm text-gray-700 leading-relaxed">일기는 하루에 한 번만 작성 가능합니다.</p>
+            </div>
+
+            <div className="mb-4">
+              <h2
+                className="text-xl font-semibold mb-2 leading-relaxed"
+                style={{
+                  fontFamily: 'CustomFont, sans-serif',
+                  fontSize: 26,
+                  color: '#6096B4',
+                }}
+              >
+                일기 둘러보기
+              </h2>
+              <p className="ml-4 text-sm text-gray-700 leading-relaxed">지금까지 쓴 일기와 그림을 둘러볼 수 있습니다.</p>
+            </div>
+
+            <div>
+              <h2
+                className="text-xl font-semibold mb-2 leading-relaxed"
+                style={{
+                  fontFamily: 'CustomFont, sans-serif',
+                  fontSize: 26,
+                  color: '#6096B4',
+                }}
+              >
+                창문 / 배경음악
+              </h2>
+              <p className="ml-4 text-sm text-gray-700 leading-relaxed">
+                오늘 쓴 일기의 감정에 맞추어 창 밖의 날씨와 배경음악이 바뀝니다.
+              </p>
+            </div>
+            {/* 모달 내용 끝 */}
+          </div>
+        </div>
+
+      )}
+
 
       <div className="fixed top-0 right-0 m-2 flex items-center text-white z-10">
 
-              {/* 설정 버튼 */}
+        {/* 설정 버튼 */}
         <div
           className="cursor-pointer mr-2"
           onClick={() => setIsModalOpen(true)}
@@ -139,30 +222,17 @@ const Layout = ({ isMain = false, router, session, onSignOut, children, delay = 
           {isBGMPlaying ? pauseIcon : playIcon}
         </div>
       </div>
-
-      {isMain && session && (
-        <div className="fixed top-0 z-[5] w-screen grid grid-cols-[1fr_auto_1fr] items-center">
-          <button className="justify-self-start ml-6" onClick={() => onSignOut()}>
-            <IconLogout className="w-8 h-8 px-1.5 py-1.5 bg-[#BDCDD6] rounded-full hover:bg-[#C7D7E0] focus:outline-none focus:shadow-outline" />
-          </button>
-          <p className="font-['CustomFont'] text-[36px] font-bold text-white">
-            {session?.user?.name}님의 하루 상자
-          </p>
+      <div className="fixed bottom-0 right-0 m-2 flex items-center text-white z-10">
+        {/* 정보 버튼 */}
+        <div
+          className="cursor-pointer p-2 text-white rounded-full"
+          onClick={() => setIsInfoModalOpen(true)}
+        >
+          {infoIcon}
         </div>
-      )}
-      {isMain && !session && (
-        <div className="fixed top-0 z-[5] w-screen flex justify-start items-center">
-          <button className="mt-3 ml-6" onClick={() => router.push('/auth/signin')}>
-            <IconLogin className="w-8 h-8 px-1.5 py-1.5 bg-[#BDCDD6] rounded-full hover:bg-[#C7D7E0] focus:outline-none focus:shadow-outline" />
-          </button>
-          <p className="ml-6 mt-1 font-['CustomFont'] text-[24px] font-bold text-gray-800">
-            로그인 하세요.
-          </p>
-        </div>
-      )}
-
+      </div>
       <motion.div
-        initial={{ y : 50, opacity: 0 }}
+        initial={{ y: 50, opacity: 0 }}
         animate={{
           y: 0,
           opacity: 1,

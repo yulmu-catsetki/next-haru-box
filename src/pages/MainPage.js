@@ -9,6 +9,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Layout from '../components/Layout';
 import { useAudio } from '../contexts/AudioContext';
 import '/public/font.css';
+import { IconLogout, IconLogin } from "@tabler/icons-react";
 
 
 const confirmSignOut = () => {
@@ -66,7 +67,7 @@ const MainPage = () => {
 
     const lastDiaryTime = new Date(timestampInMilliseconds);
     const now = new Date();
-    
+
     const nowMonth = now.getMonth();
     const nowDate = now.getDate();
 
@@ -90,7 +91,7 @@ const MainPage = () => {
       // Handle the case when session or session.user or session.user.id is undefined
       return;
     }
-    
+
     const diaryCollection = collection(db, 'users', session.user.id, 'diaries');
     const q = query(diaryCollection, orderBy('date'));
     const result = await getDocs(q);
@@ -125,7 +126,7 @@ const MainPage = () => {
 
   const SetBGM = () => {
     // BGM 설정
-    if(isLastDiaryToday() === null){
+    if (isLastDiaryToday() === null) {
       return;
     }
 
@@ -139,19 +140,33 @@ const MainPage = () => {
   };
 
   return (
-    <Layout
-      isMain={true}
-      router={router}
-      session={session}
-      onSignOut={confirmSignOut}
-      delay={0.8}
-    >
-      <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>        
+    <Layout router={router} session={session} delay={0.8}>
+      <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+        {session ? (
+          <div className="fixed top-0.5 z-[5] w-screen flex justify-start items-center">
+            <button className="justify-self-start ml-3" onClick={() => confirmSignOut()}>
+              <IconLogout className="w-8 h-8 px-1.5 py-1.5 rounded-full focus:outline-none focus:shadow-outline" style={{ stroke: "white" }} />
+            </button>
+            <p className="ml-6 font-['CustomFont'] text-[26px] text-white">
+              {session.user.name} 님의 하루 상자
+            </p>
+          </div>
+        ) : (
+          <div className="fixed top-0.5 z-[5] w-screen flex justify-start items-center">
+            <button className="justify-self-start ml-3" onClick={() => router.push('/auth/signin')}>
+              <IconLogin className="w-8 h-8 px-1.5 py-1.5 rounded-full focus:outline-none focus:shadow-outline" style={{ stroke: "black" }} />
+            </button>
+            <p className="ml-6 font-['CustomFont'] text-[26px] font-bold text-gray-800">
+              로그인 하세요.
+            </p>
+          </div>
+        )}
         <Canvas orthographic camera={{ zoom: cameraZoom, position: cameraPosition }} style={{ background: '#6096B4' }}>
           <CameraControls diaries={diaries} handleDiaryClick={handleDiaryClick} handleDashboardClick={handleDashboardClick} />
         </Canvas>
       </div>
     </Layout>
+
   );
 
 };

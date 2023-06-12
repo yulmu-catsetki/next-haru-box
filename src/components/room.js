@@ -13,7 +13,7 @@ export function Room({ handleDashboardClick }) {
 
   const router = useRouter();
 
-  useFrame(() => {});
+  useFrame(() => { });
 
   // Load video texture
   const videoTexture = useVideoTexture('/video/screen.mp4');
@@ -26,6 +26,59 @@ export function Room({ handleDashboardClick }) {
   const handleDashboardPointerOut = () => {
     setHovered(false);
   };
+
+  const [clickCount, setClickCount] = useState(0);
+  const [isAngryCat, setIsAngryCat] = useState(false);
+  const [timerId, setTimerId] = useState(null);
+
+  const handleCatClick = () => {
+
+    // Angry 상태에서 클릭될 경우
+    if (isAngryCat) {
+      // 시간을 다시 설정
+      resetTimer();
+      playAngryCatSound();
+      return;
+    }
+  
+    // 일반 클릭 처리
+    setClickCount((prevCount) => {
+      if (prevCount === 9) { // 10번째 클릭 시
+        setIsAngryCat(true); // 고양이를 angry 상태로 설정
+        resetTimer(); // 타이머 리셋
+        playAngryCatSound();
+        return 0; // 클릭 횟수를 초기화
+      } else {
+        playNormalCatSound();
+        return prevCount + 1; // 클릭 횟수 증가
+      }
+    });
+  };
+  
+  const playAngryCatSound = () => {
+    const audio = new Audio('/audio/se/angry_cat.mp3');
+    audio.volume = 0.2;
+    audio.play();
+  };
+  
+  const playNormalCatSound = () => {
+    const audio = new Audio('/audio/se/meow.mp3');
+    audio.volume = 0.2;
+    audio.play();
+  };
+  
+  const resetTimer = () => {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+  
+    const newTimerId = setTimeout(() => {
+      setIsAngryCat(false);
+    }, 10000);
+  
+    setTimerId(newTimerId);
+  };
+   
 
   return (
     <group dispose={null} ref={ref}>
@@ -64,6 +117,24 @@ export function Room({ handleDashboardClick }) {
             </mesh>
           );
         }
+
+
+        if (name === 'cat') {
+          return (
+            <mesh
+              key={index}
+              onClick={handleCatClick}
+              geometry={node.geometry}
+              material={node.material}
+              position={node.position}
+              rotation={node.rotation}
+              scale={node.scale}
+            >
+
+            </mesh>
+          );
+        }
+
 
         return (
           <mesh
