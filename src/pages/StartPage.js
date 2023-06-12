@@ -1,23 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  usePathname,
-  useRouter,
-  useSearchParams,
-  useSelectedLayoutSegment,
-  useSelectedLayoutSegments,
-  redirect,  
-  notFound,
-} from 'next/navigation';
-import { useSession } from "next-auth/react";
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import { useAudio } from '../contexts/AudioContext';
+import '/public/font.css';
 
 export default function StartPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!session) {
       router.push('/auth/signin');
     } else {
@@ -29,10 +22,11 @@ export default function StartPage() {
 
   const handleMoveToMainPage = () => {
     initPlayer();
-    router.push('/MainPage'); 
+    router.push('/MainPage');
   };
+
   const handleMoveToSignInPage = () => {
-    router.push('/auth/signin'); 
+    router.push('/auth/signin');
   };
 
   return (
@@ -43,60 +37,50 @@ export default function StartPage() {
         alignItems: 'center',
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#BDCDD6',
-        fontFamily: '나눔손글씨 부장님 눈치체',
+        backgroundColor: '#6096B4',
+        fontFamily: 'customfont',
       }}
     >
       <div
         style={{
-          position: 'relative',
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          width: '60%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          width: '80%',
           height: '80%',
           padding: '20px',
-          backgroundColor: '#EEE9DA',
-          border: '40px solid #6096B4',
-          borderRadius: 0,
-          boxSizing: 'border-box',
         }}
       >
-        <h1
-          style={{
-            position: 'absolute',
-            top: '42.5%',
-            left: '100px',
-            fontFamily: '나눔손글씨 부장님 눈치체',
-            fontSize: '35px',
-            color: '#6096B4',
-          }}
-        >
-          {session ? (
-            <>
-              {session.user.name}님, 안녕하세요! <br /> 오늘 하루는 어떠셨나요?
-            </>
-          ) : (
-            'No session found.'
-          )}
-        </h1>
-        {isLoading ? (
-          <p style={{ fontFamily: '나눔손글씨 부장님 눈치체' }}>Loading...</p>
-        ) : session ? (
-          <>
-            <div style={{ position: 'absolute', top: '35%', right: '120px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, marginLeft: '10px' }}>
+          <img src="/harubox.png" alt="Harubox Image" style={{ width: '80%', marginLeft: '20px' }} />
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h1 style={{ fontSize: '35px', color: 'white', marginBottom: '8px' }}>
+            {session ? (
+              <>
+                {session.user.name}님, 안녕하세요!<br />
+                오늘 하루는 어떠셨나요?
+              </>
+            ) : (
+              'No session found.'
+            )}
+          </h1>
+          {isLoading ? (
+            <p style={{ fontFamily: 'customfont' }}>Loading...</p>
+          ) : session ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <button
                 onClick={handleMoveToMainPage}
                 style={{
                   backgroundColor: '#93BFCF',
-                  color: '#000000',
-                  border: '2px solid #6096B4',
-                  padding: '15px 40px',
+                  color: 'white',
+                  padding: '5px 40px',
                   borderRadius: '10px',
                   fontWeight: 'bold',
-                  fontFamily: '나눔손글씨 부장님 눈치체',
+                  fontFamily: 'customfont',
                   fontSize: '25px',
-                  marginBottom: '15px',
+                  marginBottom: '5px',
+                  border: 'none',
                 }}
               >
                 내 방으로 가기
@@ -105,26 +89,23 @@ export default function StartPage() {
                 onClick={handleMoveToSignInPage}
                 style={{
                   backgroundColor: '#93BFCF',
-                  color: '#000000',
-                  border: '2px solid #6096B4',
-                  padding: '15px 40px',
+                  color: 'white',
+                  padding: '5px 40px',
                   borderRadius: '10px',
                   fontWeight: 'bold',
-                  fontFamily: '나눔손글씨 부장님 눈치체',
+                  fontFamily: 'customfont',
                   fontSize: '25px',
-                  marginTop: '15px',
+                  marginTop: '5px',
+                  border: 'none',
                 }}
               >
                 다음에 보자!
               </button>
             </div>
-          </>
-        ) : (
-          <p style={{ fontFamily: '나눔손글씨 부장님 눈치체' }}>No session found.</p>
-        )}
-      </div>
-      <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-        <img src="/harubox.png" alt="Harubox Image" style={{ width: '200px' }} />
+          ) : (
+            <p style={{ fontFamily: 'customfont' }}>No session found.</p>
+          )}
+        </div>
       </div>
     </div>
   );
