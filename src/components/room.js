@@ -108,7 +108,7 @@ export function Room({ handleDashboardClick }) {
             <mesh
               key={index}
               geometry={node.geometry}
-              material={node.material}
+              material={materials[name]}
               position={node.position}
               rotation={node.rotation}
               scale={node.scale}
