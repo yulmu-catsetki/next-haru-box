@@ -393,7 +393,8 @@ const DiaryPage = () => {
                     placeholder="일기를 작성하세요..."
                     disabled={isDiaryFinished}
                     className="w-full h-3/5 flex-grow px-3 py-2 mb-0 text-gray-700 border rounded-lg focus:outline-none focus:shadow-outline"
-                    style={{ flexBasis: '60%', fontFamily: 'CustomFont, sans-serif', fontSize: 25 }}
+                    style={{ flexBasis: '60%', fontFamily: 'CustomFont, sans-serif', fontSize: 25,  lineHeight: '1'}}
+                    
                   />
                   <div className="flex flex-col w-full px-3 py-1">
                     <div className="flex items-start">
