@@ -18,9 +18,10 @@ export function DiaryObjects({ diaries }) {
     const loadTextures = async () => {
       if (Array.isArray(diaries)) {
         await document.fonts.ready; // Wait for the font to be loaded
+        const latestDiaries = diaries.slice(-12); // Get the latest 12 diaries from the back
 
         const loadedBoxes = await Promise.all(
-          diaries.map((diary, index) =>
+          latestDiaries.map((diary, index) =>
             new Promise((resolve) => {
               const canvas = document.createElement('canvas');
               canvas.width = 600; // Set the canvas width
