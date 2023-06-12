@@ -74,7 +74,7 @@ export function Room({ handleDashboardClick }) {
   
     const newTimerId = setTimeout(() => {
       setIsAngryCat(false);
-    }, 5000); // 60000ms = 1분
+    }, 10000);
   
     setTimerId(newTimerId);
   };
