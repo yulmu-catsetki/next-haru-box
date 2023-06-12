@@ -1,7 +1,14 @@
+body{
 
+  background-color:#6096B4;
+}
 
-  
-  li{
+ul{
+  position:absolute;
+  margin:0;
+  padding:0;
+}
+  li,li-no-hover{
     text-align:center;
     display:inline-block;
     list-style:none;
@@ -15,7 +22,9 @@
     -webkit-transition:all 1s ease;
     top:50px;
   }
-
+  li-no-hover {
+    top: 0px; /* Set top to 0px for li-no-hover */
+  }
   
   
   li:hover{
