@@ -86,7 +86,7 @@ export function DiaryObjects({ diaries }) {
                   textureBack.wrapS = RepeatWrapping;
                   textureBack.repeat.set(1, 1); // Repeat the texture on the back side
 
-                  const position = [-0.5 + (index % 4) * 0.35, 0.55 - Math.floor(index / 4) * 0.25, -0.9];
+                  const position = [-0.5 + (index % 4) * 0.35, 0.55 - Math.floor(index / 4) * 0.25, -1];
 
                   const tmpBox = new THREE.BoxGeometry(0.3, 0.2, 0.01);
                   const frontMaterial = new THREE.MeshBasicMaterial({ map: textureFront });
@@ -103,9 +103,13 @@ export function DiaryObjects({ diaries }) {
                   ];
 
                   const rotation = [0, 0, 0];
-                  const handleCardClick = (event) => {
-                    const clickedBox = event.object;
-                    clickedBox.rotation.y += Math.PI;
+                  const handleCardHover = (event) => {
+                    const hoveredBox = event.object;
+                    hoveredBox.rotation.y += Math.PI;
+                  };
+                  const handleCardLeave = (event) => {
+                    const leftBox = event.object;
+                    leftBox.rotation.y -= Math.PI;
                   };
 
                   const box = (
@@ -115,7 +119,8 @@ export function DiaryObjects({ diaries }) {
                       position={position}
                       geometry={tmpBox}
                       material={materials}
-                      onClick={handleCardClick}
+                      onPointerOver={handleCardHover}
+                      onPointerLeave={handleCardLeave}
                     />
                   );
 
