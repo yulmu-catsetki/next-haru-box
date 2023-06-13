@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useAudio } from '../../contexts/AudioContext';
 import { useState } from "react";
 
-const Layout = ({ router, session, onSignOut, children, delay = 0 }) => {
+const Layout = ({ children, delay = 0 }) => {
 
   const { BGMRef, BGSRef, isBGMPlaying, isBGSPlaying, currentBGMName, toggleBGM, toggleBGS, setBGMVolume, setBGSVolume } = useAudio();
 

@@ -140,11 +140,11 @@ const MainPage = () => {
   };
 
   return (
-    <Layout router={router} session={session} delay={0.8}>
+    <Layout delay={0.8}>
       <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
         {session ? (
           <div className="fixed top-0.5 z-[5] w-screen flex justify-start items-center">
-            <button className="justify-self-start ml-3" onClick={() => confirmSignOut()}>
+            <button className="mt-1.5 ml-3" onClick={() => confirmSignOut()}>
               <IconLogout className="w-8 h-8 px-1.5 py-1.5 rounded-full focus:outline-none focus:shadow-outline" style={{ stroke: "white" }} />
             </button>
             <p className="ml-6 font-['CustomFont'] text-[26px] text-white">
@@ -153,7 +153,7 @@ const MainPage = () => {
           </div>
         ) : (
           <div className="fixed top-0.5 z-[5] w-screen flex justify-start items-center">
-            <button className="justify-self-start ml-3" onClick={() => router.push('/auth/signin')}>
+            <button className="mt-1.5 ml-3" onClick={() => router.push('/auth/signin')}>
               <IconLogin className="w-8 h-8 px-1.5 py-1.5 rounded-full focus:outline-none focus:shadow-outline" style={{ stroke: "black" }} />
             </button>
             <p className="ml-6 font-['CustomFont'] text-[26px] font-bold text-gray-800">
