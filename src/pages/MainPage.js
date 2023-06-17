@@ -56,6 +56,9 @@ const MainPage = () => {
 
   // 마지막 일기가 오늘 일기인지 확인
   const isLastDiaryToday = () => {
+    // 과제전 용
+    return false;
+
     const lastDiary = getLastDiary();
     if (!lastDiary) {
       return null;
