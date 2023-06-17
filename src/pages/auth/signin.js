@@ -4,12 +4,6 @@ import { useSession, signIn, signOut } from "next-auth/react";
 export default function Signin() {
   const router = useRouter();
   const { data: session } = useSession();
-  useEffect(() => {
-    const { testAccount } = router.query;
-    if (testAccount === 'true') {
-      signIn('credentials', { username: 'test-user', password: '1234' });
-    }
-  }, []);
 
   return (
     <div className="flex justify-center h-screen bg-pal-3">

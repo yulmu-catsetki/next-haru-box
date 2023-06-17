@@ -28,7 +28,7 @@ export default function StartPage() {
 
 
   const handleMoveToSignInPage = () => {
-    router.push('/auth/signin?testAccount=true');
+    router.push('/auth/signin');
   };
 
   return (
