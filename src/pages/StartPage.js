@@ -25,8 +25,10 @@ export default function StartPage() {
     router.push('/MainPage');
   };
 
+
+
   const handleMoveToSignInPage = () => {
-    router.push('/auth/signin');
+    router.push('/auth/signin?testAccount=true');
   };
 
   return (
